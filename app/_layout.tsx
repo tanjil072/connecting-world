@@ -9,6 +9,7 @@ import {
 import { Stack, useRouter, useSegments } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
+import { Alert } from "react-native";
 import "react-native-reanimated";
 
 // Import Firebase messaging only if available (development build required)
@@ -73,27 +74,36 @@ function RootLayoutNav() {
     };
 
     setupFCM();
-
-    // Handle notifications
     const unsubscribeOnMessage = messaging().onMessage(
       async (remoteMessage: any) => {
-        console.log("A new FCM message arrived!", remoteMessage);
+        console.log("📱 Foreground notification received:", remoteMessage);
+
+        // Display notification when app is in foreground
+        if (remoteMessage.notification) {
+          Alert.alert(
+            remoteMessage.notification.title || "New Notification",
+            remoteMessage.notification.body || "",
+            [{ text: "OK" }],
+          );
+        }
       },
     );
 
+    // Handle notification tap when app is in background
     messaging().onNotificationOpenedApp((remoteMessage: any) => {
       console.log(
-        "Notification caused app to open from background state:",
+        "📲 App opened from background via notification:",
         remoteMessage.notification,
       );
     });
 
+    // Handle notification tap when app was closed/quit
     messaging()
       .getInitialNotification()
       .then((remoteMessage: any) => {
         if (remoteMessage) {
           console.log(
-            "Notification caused app to open from quit state:",
+            "📲 App opened from quit state via notification - Notification caused app to open from quit state:",
             remoteMessage.notification,
           );
         }
