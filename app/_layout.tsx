@@ -13,7 +13,6 @@ import {
 import { Stack, useRouter, useSegments } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
-import { Alert } from "react-native";
 import "react-native-reanimated";
 
 // Import Firebase messaging only if available (development build required)
@@ -28,7 +27,7 @@ export const unstable_settings = {
   anchor: "(tabs)",
 };
 
-function RootLayoutNav() {
+const RootLayoutNav = () => {
   const { isSignedIn, isLoading } = useAuth();
   const { refreshUnreadCount } = useNotifications();
   const segments = useSegments();
@@ -88,11 +87,11 @@ function RootLayoutNav() {
 
         // Display notification when app is in foreground
         if (remoteMessage.notification) {
-          Alert.alert(
-            remoteMessage.notification.title || "New Notification",
-            remoteMessage.notification.body || "",
-            [{ text: "OK" }],
-          );
+          // Alert.alert(
+          //   remoteMessage.notification.title || "New Notification",
+          //   remoteMessage.notification.body || "",
+          //   [{ text: "OKa" }],
+          // );
         }
       },
     );
@@ -144,11 +143,10 @@ function RootLayoutNav() {
       />
     </Stack>
   );
-}
+};
 
-export default function RootLayout() {
+const RootLayout = () => {
   const colorScheme = useColorScheme();
-
   // Register background handler (needs to be registered early)
   useEffect(() => {
     if (!messaging) return;
@@ -170,4 +168,6 @@ export default function RootLayout() {
       </NotificationsProvider>
     </AuthProvider>
   );
-}
+};
+
+export default RootLayout;

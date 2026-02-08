@@ -1,6 +1,9 @@
 import { CommentCard } from "@/components/CommentsCard/comment-card";
+import { PostCard } from "@/components/PostCard/post-card";
+import { Post } from "@/components/PostCard/types";
 import { ThemedText } from "@/components/ThemedText/themed-text";
 import { ThemedView } from "@/components/ThemedView/themed-view";
+import { useThemeColor } from "@/hooks/use-theme-color";
 import { postsAPI } from "@/services/api";
 import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
@@ -27,30 +30,58 @@ interface Comment {
   createdAt: string;
 }
 
-export default function CommentsScreen() {
+const CommentsScreen = () => {
   const { postId, username } = useLocalSearchParams();
   const router = useRouter();
+  const [post, setPost] = useState<Post | null>(null);
   const [comments, setComments] = useState<Comment[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [commentText, setCommentText] = useState("");
   const [isPosting, setIsPosting] = useState(false);
 
+  const textColor = useThemeColor({}, "text");
+  const iconColor = useThemeColor({}, "icon");
+
   useEffect(() => {
-    fetchComments();
+    fetchPostAndComments();
   }, [postId]);
 
-  const fetchComments = async () => {
+  const fetchPostAndComments = async () => {
     try {
       setIsLoading(true);
-      const response = await postsAPI.getComments(postId as string);
-      setComments(response.data.data.comments);
+      const response = await postsAPI.getPostById(postId as string);
+      const postData = response.data.data;
+
+      // Set post data
+      setPost({
+        id: postData.id,
+        content: postData.content,
+        userId: postData.userId,
+        username: postData.username,
+        createdAt: postData.createdAt,
+        likesCount: postData.likesCount,
+        commentsCount: postData.commentsCount,
+        isLiked: postData.isLiked,
+      });
+
+      // Set comments
+      setComments(postData.comments || []);
     } catch (error: any) {
       Alert.alert(
         "Error",
-        error.response?.data?.message || "Failed to fetch comments",
+        error.response?.data?.message || "Failed to fetch post",
       );
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const fetchComments = async () => {
+    try {
+      const response = await postsAPI.getComments(postId as string);
+      setComments(response.data.data.comments);
+    } catch (error: any) {
+      console.error("Failed to fetch comments:", error);
     }
   };
 
@@ -63,6 +94,10 @@ export default function CommentsScreen() {
       setIsPosting(true);
       await postsAPI.commentOnPost(postId as string, commentText.trim());
       setCommentText("");
+      // Update post comments count locally
+      if (post) {
+        setPost({ ...post, commentsCount: post.commentsCount + 1 });
+      }
       fetchComments(); // Refresh comments
     } catch (error: any) {
       Alert.alert(
@@ -74,6 +109,20 @@ export default function CommentsScreen() {
     }
   };
 
+  const renderHeader = () => {
+    if (!post) return null;
+    return (
+      <View style={styles.postContainer}>
+        <PostCard post={post} />
+        <View style={styles.commentsHeader}>
+          <ThemedText type="defaultSemiBold" style={styles.commentsHeaderText}>
+            Comments ({comments.length})
+          </ThemedText>
+        </View>
+      </View>
+    );
+  };
+
   const renderComment = ({ item }: { item: Comment }) => (
     <CommentCard comment={item} />
   );
@@ -82,7 +131,7 @@ export default function CommentsScreen() {
     if (isLoading) return null;
     return (
       <View style={styles.emptyContainer}>
-        <Ionicons name="chatbubbles-outline" size={64} color="#94a3b8" />
+        <Ionicons name="chatbubbles-outline" size={64} color={iconColor} />
         <ThemedText style={styles.emptyTitle}>No comments yet</ThemedText>
         <ThemedText style={styles.emptySubtitle}>
           Be the first to comment!
@@ -105,27 +154,27 @@ export default function CommentsScreen() {
               style={styles.backButton}
               onPress={() => router.back()}
             >
-              <Ionicons name="arrow-back" size={24} color="#1a1a1a" />
+              <Ionicons name="arrow-back" size={24} color={textColor} />
             </TouchableOpacity>
             <View style={styles.headerContent}>
               <ThemedText type="defaultSemiBold" style={styles.headerTitle}>
-                Comments
+                Post
               </ThemedText>
-              {username && (
+              {(username || post?.username) && (
                 <ThemedText style={styles.headerSubtitle}>
-                  @{username}&apos;s post
+                  @{username || post?.username}&apos;s post
                 </ThemedText>
               )}
             </View>
             <View style={{ width: 40 }} />
           </View>
 
-          {/* Comments List */}
+          {/* Post and Comments List */}
           {isLoading ? (
             <View style={styles.loaderContainer}>
               <ActivityIndicator size="large" color="#6366f1" />
               <ThemedText style={styles.loadingText}>
-                Loading comments...
+                Loading post...
               </ThemedText>
             </View>
           ) : (
@@ -135,6 +184,7 @@ export default function CommentsScreen() {
               keyExtractor={(item) => item.id}
               contentContainerStyle={styles.listContent}
               showsVerticalScrollIndicator={false}
+              ListHeaderComponent={renderHeader}
               ListEmptyComponent={renderEmpty}
             />
           )}
@@ -163,7 +213,7 @@ export default function CommentsScreen() {
                 {isPosting ? (
                   <ActivityIndicator size="small" color="#ffffff" />
                 ) : (
-                  <Ionicons name="send" size={20} color="#ffffff" />
+                  <Ionicons name="send" size={20} color={textColor} />
                 )}
               </TouchableOpacity>
             </View>
@@ -172,7 +222,9 @@ export default function CommentsScreen() {
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
-}
+};
+
+export default CommentsScreen;
 
 const styles = StyleSheet.create({
   safeArea: {
@@ -223,6 +275,20 @@ const styles = StyleSheet.create({
   listContent: {
     paddingVertical: 12,
     flexGrow: 1,
+  },
+  postContainer: {
+    marginBottom: 8,
+  },
+  commentsHeader: {
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: "#e2e8f0",
+    backgroundColor: "#f8f9fa",
+  },
+  commentsHeaderText: {
+    fontSize: 16,
+    color: "#1a1a1a",
   },
   emptyContainer: {
     flex: 1,

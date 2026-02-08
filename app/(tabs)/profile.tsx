@@ -1,6 +1,7 @@
 import { ThemedText } from "@/components/ThemedText/themed-text";
 import { ThemedView } from "@/components/ThemedView/themed-view";
 import { useAuth } from "@/context/Auth/AuthContext";
+import { useThemeColor } from "@/hooks/use-theme-color";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
@@ -9,14 +10,21 @@ import {
   Alert,
   ScrollView,
   StyleSheet,
+  Text,
   TouchableOpacity,
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-export default function ProfileScreen() {
+const ProfileScreen = () => {
   const { user, logout } = useAuth();
   const router = useRouter();
+  const backgroundColor = useThemeColor({}, "background");
+  const textColor = useThemeColor({}, "text");
+  const borderColor = useThemeColor(
+    { light: "#e2e8f0", dark: "#334155" },
+    "icon",
+  );
 
   const handleLogout = () => {
     Alert.alert(
@@ -60,21 +68,21 @@ export default function ProfileScreen() {
           contentContainerStyle={styles.scrollContent}
         >
           {/* Profile Card */}
-          <View style={styles.profileCard}>
+          <View style={[styles.profileCard, { backgroundColor }]}>
             <LinearGradient
               colors={["#6366f1", "#8b5cf6", "#ec4899"]}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 1 }}
               style={styles.avatarLarge}
             >
-              <ThemedText style={styles.avatarText}>
+              <Text style={styles.avatarText}>
                 {getInitials(user?.username || "")}
-              </ThemedText>
+              </Text>
             </LinearGradient>
 
-            <ThemedText type="title" style={styles.name}>
+            <Text style={[styles.name, { color: textColor }]}>
               {user?.username}
-            </ThemedText>
+            </Text>
             <ThemedText style={styles.email}>{user?.email}</ThemedText>
           </View>
 
@@ -83,7 +91,7 @@ export default function ProfileScreen() {
             <ThemedText style={styles.sectionTitle}>Account</ThemedText>
 
             <TouchableOpacity
-              style={styles.menuItem}
+              style={[styles.menuItem, { backgroundColor }]}
               onPress={() => {
                 // Navigate to feed with username filter
                 if (user?.username) {
@@ -91,91 +99,18 @@ export default function ProfileScreen() {
                 }
               }}
             >
-              <View style={styles.menuIconContainer}>
+              <View
+                style={[
+                  styles.menuIconContainer,
+                  { backgroundColor: borderColor },
+                ]}
+              >
                 <Ionicons name="person-outline" size={22} color="#6366f1" />
               </View>
               <View style={styles.menuContent}>
-                <ThemedText style={styles.menuLabel}>My Posts</ThemedText>
+                <ThemedText style={styles.menuLabel}>View Posts</ThemedText>
                 <ThemedText style={styles.menuDescription}>
                   View all your posts
-                </ThemedText>
-              </View>
-              <Ionicons name="chevron-forward" size={20} color="#94a3b8" />
-            </TouchableOpacity>
-
-            <TouchableOpacity style={styles.menuItem}>
-              <View style={styles.menuIconContainer}>
-                <Ionicons name="heart-outline" size={22} color="#ec4899" />
-              </View>
-              <View style={styles.menuContent}>
-                <ThemedText style={styles.menuLabel}>Liked Posts</ThemedText>
-                <ThemedText style={styles.menuDescription}>
-                  Posts you&apos;ve liked
-                </ThemedText>
-              </View>
-              <Ionicons name="chevron-forward" size={20} color="#94a3b8" />
-            </TouchableOpacity>
-
-            <TouchableOpacity style={styles.menuItem}>
-              <View style={styles.menuIconContainer}>
-                <Ionicons name="bookmark-outline" size={22} color="#f59e0b" />
-              </View>
-              <View style={styles.menuContent}>
-                <ThemedText style={styles.menuLabel}>Saved Posts</ThemedText>
-                <ThemedText style={styles.menuDescription}>
-                  Your saved posts
-                </ThemedText>
-              </View>
-              <Ionicons name="chevron-forward" size={20} color="#94a3b8" />
-            </TouchableOpacity>
-          </View>
-
-          {/* Settings Section */}
-          <View style={styles.menuSection}>
-            <ThemedText style={styles.sectionTitle}>Settings</ThemedText>
-
-            <TouchableOpacity style={styles.menuItem}>
-              <View style={styles.menuIconContainer}>
-                <Ionicons
-                  name="notifications-outline"
-                  size={22}
-                  color="#10b981"
-                />
-              </View>
-              <View style={styles.menuContent}>
-                <ThemedText style={styles.menuLabel}>Notifications</ThemedText>
-                <ThemedText style={styles.menuDescription}>
-                  Manage notifications
-                </ThemedText>
-              </View>
-              <Ionicons name="chevron-forward" size={20} color="#94a3b8" />
-            </TouchableOpacity>
-
-            <TouchableOpacity style={styles.menuItem}>
-              <View style={styles.menuIconContainer}>
-                <Ionicons
-                  name="lock-closed-outline"
-                  size={22}
-                  color="#64748b"
-                />
-              </View>
-              <View style={styles.menuContent}>
-                <ThemedText style={styles.menuLabel}>Privacy</ThemedText>
-                <ThemedText style={styles.menuDescription}>
-                  Privacy settings
-                </ThemedText>
-              </View>
-              <Ionicons name="chevron-forward" size={20} color="#94a3b8" />
-            </TouchableOpacity>
-
-            <TouchableOpacity style={styles.menuItem}>
-              <View style={styles.menuIconContainer}>
-                <Ionicons name="settings-outline" size={22} color="#64748b" />
-              </View>
-              <View style={styles.menuContent}>
-                <ThemedText style={styles.menuLabel}>Settings</ThemedText>
-                <ThemedText style={styles.menuDescription}>
-                  App settings
                 </ThemedText>
               </View>
               <Ionicons name="chevron-forward" size={20} color="#94a3b8" />
@@ -186,41 +121,71 @@ export default function ProfileScreen() {
           <View style={styles.menuSection}>
             <ThemedText style={styles.sectionTitle}>About</ThemedText>
 
-            <TouchableOpacity style={styles.menuItem}>
-              <View style={styles.menuIconContainer}>
-                <Ionicons
-                  name="help-circle-outline"
-                  size={22}
-                  color="#64748b"
-                />
+            <View style={[styles.aboutCard, { backgroundColor }]}>
+              <View style={styles.aboutHeader}>
+                <LinearGradient
+                  colors={["#6366f1", "#8b5cf6"]}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                  style={styles.aboutIconContainer}
+                >
+                  <Ionicons
+                    name="information-circle-outline"
+                    size={28}
+                    color="#ffffff"
+                  />
+                </LinearGradient>
+                <View style={styles.aboutTitleContainer}>
+                  <ThemedText style={styles.aboutTitle}>
+                    Connecting World
+                  </ThemedText>
+                  <ThemedText style={styles.aboutVersion}>
+                    Version 1.0.0
+                  </ThemedText>
+                </View>
               </View>
-              <View style={styles.menuContent}>
-                <ThemedText style={styles.menuLabel}>Help & Support</ThemedText>
-                <ThemedText style={styles.menuDescription}>Get help</ThemedText>
-              </View>
-              <Ionicons name="chevron-forward" size={20} color="#94a3b8" />
-            </TouchableOpacity>
 
-            <TouchableOpacity style={styles.menuItem}>
-              <View style={styles.menuIconContainer}>
-                <Ionicons
-                  name="information-circle-outline"
-                  size={22}
-                  color="#64748b"
-                />
+              <View style={styles.aboutDivider} />
+
+              <ThemedText style={styles.aboutDescription}>
+                A social networking platform designed to bring people together
+                through meaningful connections and shared experiences.
+              </ThemedText>
+
+              <View style={styles.aboutFeatures}>
+                <View style={styles.featureRow}>
+                  <Ionicons name="checkmark-circle" size={18} color="#10b981" />
+                  <ThemedText style={styles.featureText}>
+                    Create and share posts with the community
+                  </ThemedText>
+                </View>
+                <View style={styles.featureRow}>
+                  <Ionicons name="checkmark-circle" size={18} color="#10b981" />
+                  <ThemedText style={styles.featureText}>
+                    Real-time notifications and updates
+                  </ThemedText>
+                </View>
+                <View style={styles.featureRow}>
+                  <Ionicons name="checkmark-circle" size={18} color="#10b981" />
+                  <ThemedText style={styles.featureText}>
+                    Engage with likes and comments
+                  </ThemedText>
+                </View>
               </View>
-              <View style={styles.menuContent}>
-                <ThemedText style={styles.menuLabel}>About</ThemedText>
-                <ThemedText style={styles.menuDescription}>
-                  App version 1.0.0
+
+              <View style={styles.aboutFooter}>
+                <ThemedText style={styles.aboutFooterText}>
+                  Developed by Tanjil
                 </ThemedText>
               </View>
-              <Ionicons name="chevron-forward" size={20} color="#94a3b8" />
-            </TouchableOpacity>
+            </View>
           </View>
 
           {/* Logout Button */}
-          <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+          <TouchableOpacity
+            style={[styles.logoutButton, { backgroundColor, borderColor }]}
+            onPress={handleLogout}
+          >
             <Ionicons name="log-out-outline" size={22} color="#ef4444" />
             <ThemedText style={styles.logoutText}>Logout</ThemedText>
           </TouchableOpacity>
@@ -236,12 +201,13 @@ export default function ProfileScreen() {
       </ThemedView>
     </SafeAreaView>
   );
-}
+};
+
+export default ProfileScreen;
 
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: "#f8f9fa",
   },
   container: {
     flex: 1,
@@ -260,7 +226,6 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   profileCard: {
-    backgroundColor: "#ffffff",
     borderRadius: 16,
     padding: 24,
     alignItems: "center",
@@ -310,10 +275,11 @@ const styles = StyleSheet.create({
   menuItem: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#ffffff",
     padding: 16,
     borderRadius: 12,
     marginBottom: 8,
+    borderWidth: 1,
+    borderColor: "#e2e8f0",
     shadowColor: "#000",
     shadowOffset: {
       width: 0,
@@ -327,7 +293,6 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 10,
-    backgroundColor: "#f8f9fa",
     justifyContent: "center",
     alignItems: "center",
     marginRight: 12,
@@ -348,11 +313,9 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#ffffff",
     padding: 16,
     borderRadius: 12,
     borderWidth: 1.5,
-    borderColor: "#fee2e2",
     marginBottom: 20,
     gap: 8,
   },
@@ -368,6 +331,80 @@ const styles = StyleSheet.create({
   },
   appInfoText: {
     fontSize: 12,
+    color: "#94a3b8",
+  },
+  aboutCard: {
+    borderRadius: 16,
+    padding: 20,
+    borderWidth: 1,
+    borderColor: "#e2e8f0",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    elevation: 3,
+  },
+  aboutHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 16,
+  },
+  aboutIconContainer: {
+    width: 56,
+    height: 56,
+    borderRadius: 14,
+    justifyContent: "center",
+    alignItems: "center",
+    marginRight: 12,
+  },
+  aboutTitleContainer: {
+    flex: 1,
+  },
+  aboutTitle: {
+    fontSize: 20,
+    fontWeight: "700",
+    marginBottom: 2,
+  },
+  aboutVersion: {
+    fontSize: 13,
+    color: "#94a3b8",
+  },
+  aboutDivider: {
+    height: 1,
+    backgroundColor: "#e2e8f0",
+    marginBottom: 16,
+  },
+  aboutDescription: {
+    fontSize: 14,
+    lineHeight: 22,
+    color: "#64748b",
+    marginBottom: 20,
+  },
+  aboutFeatures: {
+    gap: 12,
+    marginBottom: 20,
+  },
+  featureRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+  },
+  featureText: {
+    fontSize: 14,
+    flex: 1,
+    color: "#64748b",
+  },
+  aboutFooter: {
+    alignItems: "center",
+    paddingTop: 16,
+    borderTopWidth: 1,
+    borderTopColor: "#e2e8f0",
+  },
+  aboutFooterText: {
+    fontSize: 13,
     color: "#94a3b8",
   },
 });

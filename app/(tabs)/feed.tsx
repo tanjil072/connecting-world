@@ -18,7 +18,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-export default function FeedScreen() {
+const FeedScreen = () => {
   const router = useRouter();
   const [posts, setPosts] = useState<Post[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -84,7 +84,7 @@ export default function FeedScreen() {
   };
 
   const handleSearch = () => {
-    setFilterUsername(searchUsername.trim());
+    setFilterUsername(searchUsername.trim().toLowerCase());
   };
 
   const handleClearFilter = () => {
@@ -92,6 +92,7 @@ export default function FeedScreen() {
     setFilterUsername("");
   };
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const handleCommentPress = (postId: string, post?: Post) => {
     router.push({
       pathname: "/comments",
@@ -211,6 +212,7 @@ export default function FeedScreen() {
             keyExtractor={(item) => item.id}
             contentContainerStyle={styles.listContent}
             showsVerticalScrollIndicator={false}
+            ItemSeparatorComponent={() => <View style={styles.separator} />}
             refreshControl={
               <RefreshControl
                 refreshing={isRefreshing}
@@ -228,7 +230,9 @@ export default function FeedScreen() {
       </ThemedView>
     </SafeAreaView>
   );
-}
+};
+
+export default FeedScreen;
 
 const styles = StyleSheet.create({
   safeArea: {
@@ -312,6 +316,9 @@ const styles = StyleSheet.create({
   listContent: {
     paddingHorizontal: 20,
     paddingVertical: 12,
+  },
+  separator: {
+    height: 12,
   },
   loaderContainer: {
     flex: 1,

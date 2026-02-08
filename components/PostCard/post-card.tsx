@@ -4,7 +4,13 @@ import { postsAPI } from "@/services/api";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import React, { useState } from "react";
-import { ActivityIndicator, Alert, TouchableOpacity, View } from "react-native";
+import {
+  ActivityIndicator,
+  Alert,
+  Share,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 import styles from "./styles";
 import { PostCardProps } from "./types";
@@ -13,6 +19,13 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onCommentPress }) => {
   const [isLiking, setIsLiking] = useState(false);
   const [isLiked, setIsLiked] = useState(post.isLiked);
   const [likesCount, setLikesCount] = useState(post.likesCount);
+  const [isExpanded, setIsExpanded] = useState(false);
+
+  const MAX_CHARS = 100;
+  const shouldShowSeeMore = post.content.length > MAX_CHARS;
+  const displayContent = isExpanded
+    ? post.content
+    : post.content.substring(0, MAX_CHARS);
 
   const handleLike = async () => {
     try {
@@ -52,6 +65,27 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onCommentPress }) => {
     if (diffHours < 24) return `${diffHours} hours ago`;
     if (diffDays < 7) return `${diffDays} days ago`;
     return date.toLocaleDateString();
+  };
+
+  const handleShare = async () => {
+    try {
+      const result = await Share.share({
+        message: `Check out this post by @${post.username}:\n\n${post.content}`,
+        title: `Post by @${post.username}`,
+      });
+
+      if (result.action === Share.sharedAction) {
+        if (result.activityType) {
+          // Shared with activity type
+        } else {
+          // Shared
+        }
+      } else if (result.action === Share.dismissedAction) {
+        // Dismissed
+      }
+    } catch (error: any) {
+      Alert.alert("Error", "Failed to share post");
+    }
   };
 
   // Generate initials from username for avatar
@@ -102,7 +136,19 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onCommentPress }) => {
       </View>
 
       {/* Post content */}
-      <ThemedText style={styles.content}>{post.content}</ThemedText>
+      <View style={styles.contentContainer}>
+        <ThemedText style={styles.content}>
+          {displayContent}
+          {!isExpanded && shouldShowSeeMore && "..."}
+        </ThemedText>
+        {shouldShowSeeMore && (
+          <TouchableOpacity onPress={() => setIsExpanded(!isExpanded)}>
+            <ThemedText style={styles.seeMoreText}>
+              {isExpanded ? "See Less" : "See More"}
+            </ThemedText>
+          </TouchableOpacity>
+        )}
+      </View>
 
       {/* Divider */}
       <View style={styles.divider} />
@@ -146,7 +192,7 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onCommentPress }) => {
           </ThemedText>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.actionButton}>
+        <TouchableOpacity style={styles.actionButton} onPress={handleShare}>
           <MaterialCommunityIcons
             name="share-variant-outline"
             size={20}
