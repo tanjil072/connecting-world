@@ -1,3 +1,4 @@
+import { CustomSplashScreen } from "@/components/SplashScreen/SplashScreen";
 import { AuthProvider, useAuth } from "@/context/Auth/AuthContext";
 import {
   NotificationsProvider,
@@ -11,9 +12,13 @@ import {
   ThemeProvider,
 } from "@react-navigation/native";
 import { Stack, useRouter, useSegments } from "expo-router";
+import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import "react-native-reanimated";
+
+// Keep the splash screen visible while we fetch resources
+SplashScreen.preventAutoHideAsync();
 
 // Import Firebase messaging only if available (development build required)
 let messaging: any = null;
@@ -32,9 +37,19 @@ const RootLayoutNav = () => {
   const { refreshUnreadCount } = useNotifications();
   const segments = useSegments();
   const router = useRouter();
+  const [appIsReady, setAppIsReady] = useState(false);
+  const [showCustomSplash, setShowCustomSplash] = useState(true);
+
+  // Hide native splash screen when auth is loaded
+  useEffect(() => {
+    if (!isLoading) {
+      setAppIsReady(true);
+      SplashScreen.hideAsync();
+    }
+  }, [isLoading]);
 
   useEffect(() => {
-    if (isLoading) return;
+    if (isLoading || !appIsReady) return;
 
     const inAuthGroup = segments[0] === "(auth)";
 
@@ -118,6 +133,11 @@ const RootLayoutNav = () => {
 
     return unsubscribeOnMessage;
   }, [isSignedIn]);
+
+  // Show custom splash screen while loading
+  if (!appIsReady || showCustomSplash) {
+    return <CustomSplashScreen onFinish={() => setShowCustomSplash(false)} />;
+  }
 
   return (
     <Stack>

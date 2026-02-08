@@ -2,15 +2,11 @@ import { StyleSheet } from "react-native";
 
 const styles = StyleSheet.create({
   card: {
-    borderRadius: 20,
+    borderRadius: 16,
     overflow: "hidden",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 8,
-    elevation: 3,
-    borderWidth: 1,
-    borderColor: "#e2e8f0",
+
+    borderWidth: 0.5,
+    borderColor: "#bbbbbb",
   },
   header: {
     flexDirection: "row",
@@ -73,22 +69,21 @@ const styles = StyleSheet.create({
   },
   divider: {
     height: 1,
-    backgroundColor: "#334155",
+    backgroundColor: "#eaeaea",
     marginVertical: 4,
   },
   footer: {
     flexDirection: "row",
     justifyContent: "space-around",
-    paddingVertical: 12,
-    paddingHorizontal: 8,
+    paddingVertical: 6,
   },
   actionButton: {
     flexDirection: "row",
     alignItems: "center",
     flex: 1,
     justifyContent: "center",
-    paddingVertical: 10,
-    paddingHorizontal: 8,
+    paddingVertical: 6,
+    paddingHorizontal: 4,
     borderRadius: 12,
     marginHorizontal: 4,
   },

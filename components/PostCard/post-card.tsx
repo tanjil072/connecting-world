@@ -3,7 +3,7 @@ import { ThemedView } from "@/components/ThemedView/themed-view";
 import { postsAPI } from "@/services/api";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -12,6 +12,7 @@ import {
   View,
 } from "react-native";
 
+import { getInitials } from "@/constants/helpers";
 import styles from "./styles";
 import { PostCardProps } from "./types";
 
@@ -19,7 +20,15 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onCommentPress }) => {
   const [isLiking, setIsLiking] = useState(false);
   const [isLiked, setIsLiked] = useState(post.isLiked);
   const [likesCount, setLikesCount] = useState(post.likesCount);
+  const [commentsCount, setCommentsCount] = useState(post.commentsCount);
   const [isExpanded, setIsExpanded] = useState(false);
+
+  // Sync state when post prop changes (e.g., on refresh)
+  useEffect(() => {
+    setIsLiked(post.isLiked);
+    setLikesCount(post.likesCount);
+    setCommentsCount(post.commentsCount);
+  }, [post.id, post.likesCount, post.commentsCount, post.isLiked]);
 
   const MAX_CHARS = 100;
   const shouldShowSeeMore = post.content.length > MAX_CHARS;
@@ -88,20 +97,6 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onCommentPress }) => {
     }
   };
 
-  // Generate initials from username for avatar
-  const getInitials = (username: string) => {
-    if (!username) return "?";
-    return (
-      username
-        .split(" ")
-        .map((word) => word[0])
-        .filter((char) => char)
-        .join("")
-        .toUpperCase()
-        .slice(0, 2) || username.substring(0, 2).toUpperCase()
-    );
-  };
-
   return (
     <ThemedView style={styles.card}>
       {/* Header with profile picture, name, and menu */}
@@ -126,13 +121,6 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onCommentPress }) => {
             </ThemedText>
           </View>
         </View>
-        <TouchableOpacity style={styles.menuButton}>
-          <MaterialCommunityIcons
-            name="dots-horizontal"
-            size={22}
-            color="#64748b"
-          />
-        </TouchableOpacity>
       </View>
 
       {/* Post content */}
@@ -187,9 +175,7 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onCommentPress }) => {
             size={20}
             color="#64748b"
           />
-          <ThemedText style={styles.commentText}>
-            {post.commentsCount}
-          </ThemedText>
+          <ThemedText style={styles.commentText}>{commentsCount}</ThemedText>
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.actionButton} onPress={handleShare}>
