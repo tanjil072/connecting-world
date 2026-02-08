@@ -1,11 +1,11 @@
 import { CommentCard } from "@/components/CommentsCard/comment-card";
-import { PostCard } from "@/components/PostCard/post-card";
 import { Post } from "@/components/PostCard/types";
 import { ThemedText } from "@/components/ThemedText/themed-text";
 import { ThemedView } from "@/components/ThemedView/themed-view";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { postsAPI } from "@/services/api";
-import { Ionicons } from "@expo/vector-icons";
+import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
@@ -41,6 +41,35 @@ const CommentsScreen = () => {
 
   const textColor = useThemeColor({}, "text");
   const iconColor = useThemeColor({}, "icon");
+  const backgroundColor = useThemeColor({}, "background");
+
+  const getInitials = (username: string) => {
+    if (!username) return "?";
+    return (
+      username
+        .split(" ")
+        .map((word) => word[0])
+        .filter((char) => char)
+        .join("")
+        .toUpperCase()
+        .slice(0, 2) || username.substring(0, 2).toUpperCase()
+    );
+  };
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMins / 60);
+    const diffDays = Math.floor(diffHours / 24);
+
+    if (diffMins < 1) return "just now";
+    if (diffMins < 60) return `${diffMins} mins ago`;
+    if (diffHours < 24) return `${diffHours} hours ago`;
+    if (diffDays < 7) return `${diffDays} days ago`;
+    return date.toLocaleDateString();
+  };
 
   useEffect(() => {
     fetchPostAndComments();
@@ -64,8 +93,12 @@ const CommentsScreen = () => {
         isLiked: postData.isLiked,
       });
 
-      // Set comments
-      setComments(postData.comments || []);
+      // Set comments (sorted in ascending order - oldest to newest)
+      const sortedComments = (postData.comments || []).sort(
+        (a: Comment, b: Comment) =>
+          new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
+      );
+      setComments(sortedComments);
     } catch (error: any) {
       Alert.alert(
         "Error",
@@ -79,7 +112,11 @@ const CommentsScreen = () => {
   const fetchComments = async () => {
     try {
       const response = await postsAPI.getComments(postId as string);
-      setComments(response.data.data.comments);
+      const sortedComments = (response.data.data.comments || []).sort(
+        (a: Comment, b: Comment) =>
+          new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
+      );
+      setComments(sortedComments);
     } catch (error: any) {
       console.error("Failed to fetch comments:", error);
     }
@@ -113,7 +150,51 @@ const CommentsScreen = () => {
     if (!post) return null;
     return (
       <View style={styles.postContainer}>
-        <PostCard post={post} />
+        {/* Custom Post Card */}
+        <ThemedView style={styles.postCard}>
+          <View style={styles.postHeader}>
+            <LinearGradient
+              colors={["#6366f1", "#8b5cf6", "#ec4899"]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={styles.postAvatar}
+            >
+              <ThemedText style={styles.postAvatarText}>
+                {getInitials(post.username)}
+              </ThemedText>
+            </LinearGradient>
+            <View style={styles.postHeaderInfo}>
+              <ThemedText type="defaultSemiBold" style={styles.postUsername}>
+                {post.username}
+              </ThemedText>
+              <ThemedText style={styles.postTimestamp}>
+                {formatDate(post.createdAt)}
+              </ThemedText>
+            </View>
+          </View>
+
+          {/* Post Content */}
+          <ThemedText style={styles.postContent}>{post.content}</ThemedText>
+
+          {/* Post Stats */}
+          <View style={styles.postStats}>
+            <View style={styles.statItem}>
+              <MaterialCommunityIcons name="heart" size={18} color="#ec4899" />
+              <ThemedText style={styles.statText}>{post.likesCount}</ThemedText>
+            </View>
+            <View style={styles.statItem}>
+              <MaterialCommunityIcons
+                name="comment"
+                size={18}
+                color="#6366f1"
+              />
+              <ThemedText style={styles.statText}>
+                {post.commentsCount}
+              </ThemedText>
+            </View>
+          </View>
+        </ThemedView>
+
         <View style={styles.commentsHeader}>
           <ThemedText type="defaultSemiBold" style={styles.commentsHeaderText}>
             Comments ({comments.length})
@@ -278,6 +359,60 @@ const styles = StyleSheet.create({
   },
   postContainer: {
     marginBottom: 8,
+  },
+  postCard: {
+    paddingHorizontal: 20,
+  },
+  postHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 16,
+  },
+  postAvatar: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    justifyContent: "center",
+    alignItems: "center",
+    marginRight: 12,
+  },
+  postAvatarText: {
+    color: "#ffffff",
+    fontSize: 18,
+    fontWeight: "700",
+  },
+  postHeaderInfo: {
+    flex: 1,
+  },
+  postUsername: {
+    fontSize: 16,
+    marginBottom: 2,
+  },
+  postTimestamp: {
+    fontSize: 13,
+    color: "#64748b",
+  },
+  postContent: {
+    fontSize: 15,
+    lineHeight: 22,
+    marginBottom: 16,
+  },
+  postStats: {
+    flexDirection: "row",
+    gap: 20,
+    paddingTop: 12,
+    borderTopWidth: 1,
+    borderTopColor: "#e2e8f0",
+  },
+  statItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+  },
+  statText: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: "#64748b",
   },
   commentsHeader: {
     paddingHorizontal: 16,
