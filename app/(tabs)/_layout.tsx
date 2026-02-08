@@ -1,5 +1,6 @@
 import { Tabs } from "expo-router";
 import React from "react";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { HapticTab } from "@/components/HecticTab/haptic-tab";
 import { Colors } from "@/constants/theme";
@@ -11,6 +12,7 @@ import { StyleSheet, Text, View } from "react-native";
 export default function TabLayout() {
   const colorScheme = useColorScheme();
   const { unreadCount } = useNotifications();
+  const insets = useSafeAreaInsets();
 
   return (
     <Tabs
@@ -22,9 +24,9 @@ export default function TabLayout() {
           backgroundColor: colorScheme === "dark" ? "#1e293b" : "#ffffff",
           borderTopColor: colorScheme === "dark" ? "#334155" : "#e2e8f0",
           borderTopWidth: 1,
-          paddingBottom: 8,
+          paddingBottom: Math.max(8, insets.bottom),
           paddingTop: 8,
-          height: 60,
+          height: 60 + Math.max(0, insets.bottom),
         },
       }}
     >

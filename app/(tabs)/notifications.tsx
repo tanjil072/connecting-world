@@ -12,6 +12,10 @@ import {
   Text,
   View,
 } from "react-native";
+import {
+  SafeAreaView,
+  useSafeAreaInsets,
+} from "react-native-safe-area-context";
 
 interface NotificationData {
   _id: string;
@@ -26,6 +30,7 @@ interface NotificationData {
 export default function NotificationsScreen() {
   const router = useRouter();
   const { refreshUnreadCount, decrementUnreadCount } = useNotifications();
+  const insets = useSafeAreaInsets();
   const [notifications, setNotifications] = useState<NotificationData[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -165,43 +170,45 @@ export default function NotificationsScreen() {
   };
 
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>Notifications</Text>
-        {unreadCount > 0 && (
-          <Pressable onPress={() => markAsRead("all")}>
-            <Text style={styles.markAllRead}>Mark all as read</Text>
-          </Pressable>
+    <SafeAreaView style={styles.container} edges={["top"]}>
+      <View style={styles.content}>
+        <View style={[styles.header, { paddingTop: Math.max(16, insets.top) }]}>
+          <Text style={styles.headerTitle}>Notifications</Text>
+          {unreadCount > 0 && (
+            <Pressable onPress={() => markAsRead("all")}>
+              <Text style={styles.markAllRead}>Mark all as read</Text>
+            </Pressable>
+          )}
+        </View>
+
+        {loading && page === 1 ? (
+          <View style={styles.centerContainer}>
+            <ActivityIndicator size="large" color="#4ECDC4" />
+          </View>
+        ) : notifications.length === 0 ? (
+          <View style={styles.centerContainer}>
+            <Ionicons name="notifications-outline" size={64} color="#ccc" />
+            <Text style={styles.emptyText}>No notifications yet</Text>
+          </View>
+        ) : (
+          <FlatList
+            data={notifications}
+            renderItem={renderNotification}
+            keyExtractor={(item) => item._id}
+            refreshControl={
+              <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+            }
+            onEndReached={loadMore}
+            onEndReachedThreshold={0.5}
+            ListFooterComponent={
+              loading && page > 1 ? (
+                <ActivityIndicator style={styles.loadMore} color="#4ECDC4" />
+              ) : null
+            }
+          />
         )}
       </View>
-
-      {loading && page === 1 ? (
-        <View style={styles.centerContainer}>
-          <ActivityIndicator size="large" color="#4ECDC4" />
-        </View>
-      ) : notifications.length === 0 ? (
-        <View style={styles.centerContainer}>
-          <Ionicons name="notifications-outline" size={64} color="#ccc" />
-          <Text style={styles.emptyText}>No notifications yet</Text>
-        </View>
-      ) : (
-        <FlatList
-          data={notifications}
-          renderItem={renderNotification}
-          keyExtractor={(item) => item._id}
-          refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-          }
-          onEndReached={loadMore}
-          onEndReachedThreshold={0.5}
-          ListFooterComponent={
-            loading && page > 1 ? (
-              <ActivityIndicator style={styles.loadMore} color="#4ECDC4" />
-            ) : null
-          }
-        />
-      )}
-    </View>
+    </SafeAreaView>
   );
 }
 
@@ -209,6 +216,9 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#fff",
+  },
+  content: {
+    flex: 1,
   },
   header: {
     flexDirection: "row",
