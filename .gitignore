@@ -33,6 +33,11 @@ yarn-error.*
 # local env files
 .env*.local
 
+# Firebase configuration files (sensitive)
+google-services.json
+connectingworld-76bdc-firebase-adminsdk-fbsvc-2a53a95763.json
+*-firebase-adminsdk-*.json
+
 # typescript
 *.tsbuildinfo
 
