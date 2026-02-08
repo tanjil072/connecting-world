@@ -9,6 +9,7 @@ import {
   Alert,
   ScrollView,
   StyleSheet,
+  Text,
   TouchableOpacity,
   View,
 } from "react-native";
@@ -67,14 +68,12 @@ export default function ProfileScreen() {
               end={{ x: 1, y: 1 }}
               style={styles.avatarLarge}
             >
-              <ThemedText style={styles.avatarText}>
+              <Text style={styles.avatarText}>
                 {getInitials(user?.username || "")}
-              </ThemedText>
+              </Text>
             </LinearGradient>
 
-            <ThemedText type="title" style={styles.name}>
-              {user?.username}
-            </ThemedText>
+            <Text style={styles.name}>{user?.username}</Text>
             <ThemedText style={styles.email}>{user?.email}</ThemedText>
           </View>
 

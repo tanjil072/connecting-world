@@ -4,7 +4,6 @@ const styles = StyleSheet.create({
   card: {
     borderRadius: 20,
     overflow: "hidden",
-    margin: 10,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.08,
@@ -57,10 +56,18 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(99, 102, 241, 0.08)",
   },
   content: {
-    paddingHorizontal: 16,
-    paddingVertical: 12,
     fontSize: 15,
     lineHeight: 24,
+  },
+  contentContainer: {
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+  },
+  seeMoreText: {
+    color: "#6366f1",
+    fontWeight: "600",
+    fontSize: 14,
+    marginTop: 4,
   },
   divider: {
     height: 1,

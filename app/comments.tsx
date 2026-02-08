@@ -1,6 +1,7 @@
 import { CommentCard } from "@/components/CommentsCard/comment-card";
 import { ThemedText } from "@/components/ThemedText/themed-text";
 import { ThemedView } from "@/components/ThemedView/themed-view";
+import { useThemeColor } from "@/hooks/use-theme-color";
 import { postsAPI } from "@/services/api";
 import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
@@ -34,6 +35,9 @@ export default function CommentsScreen() {
   const [isLoading, setIsLoading] = useState(true);
   const [commentText, setCommentText] = useState("");
   const [isPosting, setIsPosting] = useState(false);
+
+  const textColor = useThemeColor({}, "text");
+  const iconColor = useThemeColor({}, "icon");
 
   useEffect(() => {
     fetchComments();
@@ -82,7 +86,7 @@ export default function CommentsScreen() {
     if (isLoading) return null;
     return (
       <View style={styles.emptyContainer}>
-        <Ionicons name="chatbubbles-outline" size={64} color="#94a3b8" />
+        <Ionicons name="chatbubbles-outline" size={64} color={iconColor} />
         <ThemedText style={styles.emptyTitle}>No comments yet</ThemedText>
         <ThemedText style={styles.emptySubtitle}>
           Be the first to comment!
@@ -105,7 +109,7 @@ export default function CommentsScreen() {
               style={styles.backButton}
               onPress={() => router.back()}
             >
-              <Ionicons name="arrow-back" size={24} color="#1a1a1a" />
+              <Ionicons name="arrow-back" size={24} color={textColor} />
             </TouchableOpacity>
             <View style={styles.headerContent}>
               <ThemedText type="defaultSemiBold" style={styles.headerTitle}>
@@ -163,7 +167,7 @@ export default function CommentsScreen() {
                 {isPosting ? (
                   <ActivityIndicator size="small" color="#ffffff" />
                 ) : (
-                  <Ionicons name="send" size={20} color="#ffffff" />
+                  <Ionicons name="send" size={20} color={textColor} />
                 )}
               </TouchableOpacity>
             </View>

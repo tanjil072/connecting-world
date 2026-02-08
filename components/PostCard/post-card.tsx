@@ -13,6 +13,13 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onCommentPress }) => {
   const [isLiking, setIsLiking] = useState(false);
   const [isLiked, setIsLiked] = useState(post.isLiked);
   const [likesCount, setLikesCount] = useState(post.likesCount);
+  const [isExpanded, setIsExpanded] = useState(false);
+
+  const MAX_CHARS = 100;
+  const shouldShowSeeMore = post.content.length > MAX_CHARS;
+  const displayContent = isExpanded
+    ? post.content
+    : post.content.substring(0, MAX_CHARS);
 
   const handleLike = async () => {
     try {
@@ -102,7 +109,19 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onCommentPress }) => {
       </View>
 
       {/* Post content */}
-      <ThemedText style={styles.content}>{post.content}</ThemedText>
+      <View style={styles.contentContainer}>
+        <ThemedText style={styles.content}>
+          {displayContent}
+          {!isExpanded && shouldShowSeeMore && "..."}
+        </ThemedText>
+        {shouldShowSeeMore && (
+          <TouchableOpacity onPress={() => setIsExpanded(!isExpanded)}>
+            <ThemedText style={styles.seeMoreText}>
+              {isExpanded ? "See Less" : "See More"}
+            </ThemedText>
+          </TouchableOpacity>
+        )}
+      </View>
 
       {/* Divider */}
       <View style={styles.divider} />
