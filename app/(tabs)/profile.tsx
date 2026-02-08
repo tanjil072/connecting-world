@@ -4,13 +4,17 @@ import { ThemedView } from "@/components/ThemedView/themed-view";
 import { useAuth } from "@/context/Auth/AuthContext";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { Ionicons } from "@expo/vector-icons";
+import messaging from "@react-native-firebase/messaging";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Alert,
+  PermissionsAndroid,
+  Platform,
   ScrollView,
   StyleSheet,
+  Switch,
   Text,
   TouchableOpacity,
   View,
@@ -21,12 +25,131 @@ const ProfileScreen = () => {
   const { user, logout } = useAuth();
   const router = useRouter();
   const [showAboutModal, setShowAboutModal] = useState(false);
+  const [notificationsEnabled, setNotificationsEnabled] = useState(false);
   const backgroundColor = useThemeColor({}, "background");
   const textColor = useThemeColor({}, "text");
   const borderColor = useThemeColor(
     { light: "#e2e8f0", dark: "#334155" },
     "icon",
   );
+
+  // Check notification permission status on mount
+  useEffect(() => {
+    checkNotificationPermission();
+  }, []);
+
+  const checkNotificationPermission = async () => {
+    try {
+      if (messaging) {
+        // Get the current permission status without requesting
+        const authStatus = await messaging().hasPermission();
+        console.log("Current notification permission status:", authStatus);
+
+        // Only consider AUTHORIZED as enabled (not PROVISIONAL)
+        const enabled = authStatus === messaging.AuthorizationStatus.AUTHORIZED;
+        console.log("Notifications enabled:", enabled);
+        setNotificationsEnabled(enabled);
+      }
+    } catch (error) {
+      console.error("Error checking notification permission:", error);
+    }
+  };
+
+  const handleToggleNotifications = async (value: boolean) => {
+    try {
+      if (value) {
+        console.log("🔔 Requesting notification permission...");
+        console.log("Platform:", Platform.OS);
+
+        let authStatus: any;
+        let enabled = false;
+
+        if (Platform.OS === "android") {
+          // For Android, request the POST_NOTIFICATIONS permission
+          console.log("📱 Android: Requesting POST_NOTIFICATIONS permission");
+
+          try {
+            if (PermissionsAndroid) {
+              try {
+                const result = await PermissionsAndroid.request(
+                  PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS,
+                  {
+                    title: "Notification Permission",
+                    message:
+                      "This app needs permission to send you notifications",
+                    buttonNeutral: "Ask Me Later",
+                    buttonNegative: "Cancel",
+                    buttonPositive: "OK",
+                  },
+                );
+
+                console.log("Android Permission Result:", result);
+                enabled = result === PermissionsAndroid.RESULTS.GRANTED;
+
+                if (enabled) {
+                  // Still request Firebase permission
+                  authStatus = await messaging().requestPermission();
+                  console.log(
+                    "Firebase Permission after Android request:",
+                    authStatus,
+                  );
+                }
+              } catch (err) {
+                console.error("Error requesting Android permission:", err);
+              }
+            } else {
+              // Fallback: just request Firebase permission
+              authStatus = await messaging().requestPermission();
+              console.log("Permission request result:", authStatus);
+              enabled =
+                authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
+                authStatus === messaging.AuthorizationStatus.PROVISIONAL;
+            }
+          } catch (err) {
+            console.error("Android permission error:", err);
+            authStatus = await messaging().requestPermission();
+            enabled =
+              authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
+              authStatus === messaging.AuthorizationStatus.PROVISIONAL;
+          }
+        } else {
+          // For iOS
+          console.log("🍎 iOS: Requesting notification permission");
+          authStatus = await messaging().requestPermission();
+          console.log("Permission request result:", authStatus);
+          const isAuthorized =
+            authStatus === messaging.AuthorizationStatus.AUTHORIZED;
+          const isProvisional =
+            authStatus === messaging.AuthorizationStatus.PROVISIONAL;
+          enabled = isAuthorized || isProvisional;
+        }
+
+        if (enabled) {
+          setNotificationsEnabled(true);
+          try {
+            const token = await messaging().getToken();
+            console.log("✅ FCM Token obtained:", token);
+          } catch (tokenError) {
+            console.error("❌ Error getting FCM token:", tokenError);
+          }
+          Alert.alert("Success", "Notifications enabled successfully!");
+        } else {
+          console.log("❌ Permission not granted");
+          setNotificationsEnabled(false);
+          Alert.alert(
+            "Permission Denied",
+            "You denied notification permissions. Please enable them in Settings > Apps > Connecting World > Notifications.",
+          );
+        }
+      } else {
+        setNotificationsEnabled(false);
+      }
+    } catch (error) {
+      console.error("Error toggling notifications:", error);
+      setNotificationsEnabled(false);
+      Alert.alert("Error", "Failed to update notification settings");
+    }
+  };
 
   const handleLogout = () => {
     Alert.alert(
@@ -117,6 +240,33 @@ const ProfileScreen = () => {
               </View>
               <Ionicons name="chevron-forward" size={20} color="#94a3b8" />
             </TouchableOpacity>
+
+            <View style={[styles.menuItem, { backgroundColor }]}>
+              <View
+                style={[
+                  styles.menuIconContainer,
+                  { backgroundColor: borderColor },
+                ]}
+              >
+                <Ionicons
+                  name="notifications-outline"
+                  size={22}
+                  color="#10b981"
+                />
+              </View>
+              <View style={styles.menuContent}>
+                <ThemedText style={styles.menuLabel}>Notifications</ThemedText>
+                <ThemedText style={styles.menuDescription}>
+                  {notificationsEnabled ? "Enabled" : "Disabled"}
+                </ThemedText>
+              </View>
+              <Switch
+                value={notificationsEnabled}
+                onValueChange={handleToggleNotifications}
+                trackColor={{ false: "#cbd5e1", true: "#86efac" }}
+                thumbColor={notificationsEnabled ? "#10b981" : "#94a3b8"}
+              />
+            </View>
           </View>
 
           {/* About Section */}

@@ -12,6 +12,7 @@ import {
   View,
 } from "react-native";
 
+import { getInitials } from "@/constants/helpers";
 import styles from "./styles";
 import { PostCardProps } from "./types";
 
@@ -96,20 +97,6 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onCommentPress }) => {
     }
   };
 
-  // Generate initials from username for avatar
-  const getInitials = (username: string) => {
-    if (!username) return "?";
-    return (
-      username
-        .split(" ")
-        .map((word) => word[0])
-        .filter((char) => char)
-        .join("")
-        .toUpperCase()
-        .slice(0, 2) || username.substring(0, 2).toUpperCase()
-    );
-  };
-
   return (
     <ThemedView style={styles.card}>
       {/* Header with profile picture, name, and menu */}
@@ -134,13 +121,6 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onCommentPress }) => {
             </ThemedText>
           </View>
         </View>
-        <TouchableOpacity style={styles.menuButton}>
-          <MaterialCommunityIcons
-            name="dots-horizontal"
-            size={22}
-            color="#64748b"
-          />
-        </TouchableOpacity>
       </View>
 
       {/* Post content */}

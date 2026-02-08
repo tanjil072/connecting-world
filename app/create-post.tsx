@@ -1,5 +1,6 @@
 import { ThemedText } from "@/components/ThemedText/themed-text";
 import { ThemedView } from "@/components/ThemedView/themed-view";
+import { getInitials } from "@/constants/helpers";
 import { useAuth } from "@/context/Auth/AuthContext";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { postsAPI } from "@/services/api";
@@ -108,9 +109,7 @@ const CreatePostScreen = () => {
             <View style={styles.userInfo}>
               <View style={styles.avatar}>
                 <ThemedText style={styles.avatarText}>
-                  {user?.username
-                    ? user.username.substring(0, 2).toUpperCase()
-                    : "??"}
+                  {getInitials(user?.username || "Unknown User")}
                 </ThemedText>
               </View>
               <ThemedText type="defaultSemiBold" style={styles.username}>

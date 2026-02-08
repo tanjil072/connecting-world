@@ -1,7 +1,6 @@
-import { ThemedText } from "@/components/ThemedText/themed-text";
 import { LinearGradient } from "expo-linear-gradient";
 import React, { useEffect, useRef } from "react";
-import { Animated, Image, StyleSheet, View } from "react-native";
+import { Animated, Image, StyleSheet, Text, View } from "react-native";
 
 interface SplashScreenProps {
   onFinish?: () => void;
@@ -78,10 +77,8 @@ export const CustomSplashScreen: React.FC<SplashScreenProps> = ({
           />
         </Animated.View>
 
-        <ThemedText style={styles.title}>Connecting World</ThemedText>
-        <ThemedText style={styles.subtitle}>
-          Bringing people together
-        </ThemedText>
+        <Text style={styles.title}>Connecting World</Text>
+        <Text style={styles.subtitle}>Bringing people together</Text>
 
         <View style={styles.dotsContainer}>
           <Animated.View
