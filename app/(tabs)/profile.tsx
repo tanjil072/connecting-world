@@ -108,107 +108,9 @@ const ProfileScreen = () => {
                 <Ionicons name="person-outline" size={22} color="#6366f1" />
               </View>
               <View style={styles.menuContent}>
-                <ThemedText style={styles.menuLabel}>My Posts</ThemedText>
+                <ThemedText style={styles.menuLabel}>View Posts</ThemedText>
                 <ThemedText style={styles.menuDescription}>
                   View all your posts
-                </ThemedText>
-              </View>
-              <Ionicons name="chevron-forward" size={20} color="#94a3b8" />
-            </TouchableOpacity>
-
-            <TouchableOpacity style={[styles.menuItem, { backgroundColor }]}>
-              <View style={styles.menuIconContainer}>
-                <Ionicons name="heart-outline" size={22} color="#ec4899" />
-              </View>
-              <View style={styles.menuContent}>
-                <ThemedText style={styles.menuLabel}>Liked Posts</ThemedText>
-                <ThemedText style={styles.menuDescription}>
-                  Posts you&apos;ve liked
-                </ThemedText>
-              </View>
-              <Ionicons name="chevron-forward" size={20} color="#94a3b8" />
-            </TouchableOpacity>
-
-            <TouchableOpacity style={[styles.menuItem, { backgroundColor }]}>
-              <View
-                style={[
-                  styles.menuIconContainer,
-                  { backgroundColor: borderColor },
-                ]}
-              >
-                <Ionicons name="bookmark-outline" size={22} color="#f59e0b" />
-              </View>
-              <View style={styles.menuContent}>
-                <ThemedText style={styles.menuLabel}>Saved Posts</ThemedText>
-                <ThemedText style={styles.menuDescription}>
-                  Your saved posts
-                </ThemedText>
-              </View>
-              <Ionicons name="chevron-forward" size={20} color="#94a3b8" />
-            </TouchableOpacity>
-          </View>
-
-          {/* Settings Section */}
-          <View style={styles.menuSection}>
-            <ThemedText style={styles.sectionTitle}>Settings</ThemedText>
-
-            <TouchableOpacity style={[styles.menuItem, { backgroundColor }]}>
-              <View
-                style={[
-                  styles.menuIconContainer,
-                  { backgroundColor: borderColor },
-                ]}
-              >
-                <Ionicons
-                  name="notifications-outline"
-                  size={22}
-                  color="#10b981"
-                />
-              </View>
-              <View style={styles.menuContent}>
-                <ThemedText style={styles.menuLabel}>Notifications</ThemedText>
-                <ThemedText style={styles.menuDescription}>
-                  Manage notifications
-                </ThemedText>
-              </View>
-              <Ionicons name="chevron-forward" size={20} color="#94a3b8" />
-            </TouchableOpacity>
-
-            <TouchableOpacity style={[styles.menuItem, { backgroundColor }]}>
-              <View
-                style={[
-                  styles.menuIconContainer,
-                  { backgroundColor: borderColor },
-                ]}
-              >
-                <Ionicons
-                  name="lock-closed-outline"
-                  size={22}
-                  color="#64748b"
-                />
-              </View>
-              <View style={styles.menuContent}>
-                <ThemedText style={styles.menuLabel}>Privacy</ThemedText>
-                <ThemedText style={styles.menuDescription}>
-                  Privacy settings
-                </ThemedText>
-              </View>
-              <Ionicons name="chevron-forward" size={20} color="#94a3b8" />
-            </TouchableOpacity>
-
-            <TouchableOpacity style={[styles.menuItem, { backgroundColor }]}>
-              <View
-                style={[
-                  styles.menuIconContainer,
-                  { backgroundColor: borderColor },
-                ]}
-              >
-                <Ionicons name="settings-outline" size={22} color="#64748b" />
-              </View>
-              <View style={styles.menuContent}>
-                <ThemedText style={styles.menuLabel}>Settings</ThemedText>
-                <ThemedText style={styles.menuDescription}>
-                  App settings
                 </ThemedText>
               </View>
               <Ionicons name="chevron-forward" size={20} color="#94a3b8" />
@@ -219,47 +121,64 @@ const ProfileScreen = () => {
           <View style={styles.menuSection}>
             <ThemedText style={styles.sectionTitle}>About</ThemedText>
 
-            <TouchableOpacity style={[styles.menuItem, { backgroundColor }]}>
-              <View
-                style={[
-                  styles.menuIconContainer,
-                  { backgroundColor: borderColor },
-                ]}
-              >
-                <Ionicons
-                  name="help-circle-outline"
-                  size={22}
-                  color="#64748b"
-                />
+            <View style={[styles.aboutCard, { backgroundColor }]}>
+              <View style={styles.aboutHeader}>
+                <LinearGradient
+                  colors={["#6366f1", "#8b5cf6"]}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                  style={styles.aboutIconContainer}
+                >
+                  <Ionicons
+                    name="information-circle-outline"
+                    size={28}
+                    color="#ffffff"
+                  />
+                </LinearGradient>
+                <View style={styles.aboutTitleContainer}>
+                  <ThemedText style={styles.aboutTitle}>
+                    Connecting World
+                  </ThemedText>
+                  <ThemedText style={styles.aboutVersion}>
+                    Version 1.0.0
+                  </ThemedText>
+                </View>
               </View>
-              <View style={styles.menuContent}>
-                <ThemedText style={styles.menuLabel}>Help & Support</ThemedText>
-                <ThemedText style={styles.menuDescription}>Get help</ThemedText>
-              </View>
-              <Ionicons name="chevron-forward" size={20} color="#94a3b8" />
-            </TouchableOpacity>
 
-            <TouchableOpacity style={[styles.menuItem, { backgroundColor }]}>
-              <View
-                style={[
-                  styles.menuIconContainer,
-                  { backgroundColor: borderColor },
-                ]}
-              >
-                <Ionicons
-                  name="information-circle-outline"
-                  size={22}
-                  color="#64748b"
-                />
+              <View style={styles.aboutDivider} />
+
+              <ThemedText style={styles.aboutDescription}>
+                A social networking platform designed to bring people together
+                through meaningful connections and shared experiences.
+              </ThemedText>
+
+              <View style={styles.aboutFeatures}>
+                <View style={styles.featureRow}>
+                  <Ionicons name="checkmark-circle" size={18} color="#10b981" />
+                  <ThemedText style={styles.featureText}>
+                    Create and share posts with the community
+                  </ThemedText>
+                </View>
+                <View style={styles.featureRow}>
+                  <Ionicons name="checkmark-circle" size={18} color="#10b981" />
+                  <ThemedText style={styles.featureText}>
+                    Real-time notifications and updates
+                  </ThemedText>
+                </View>
+                <View style={styles.featureRow}>
+                  <Ionicons name="checkmark-circle" size={18} color="#10b981" />
+                  <ThemedText style={styles.featureText}>
+                    Engage with likes and comments
+                  </ThemedText>
+                </View>
               </View>
-              <View style={styles.menuContent}>
-                <ThemedText style={styles.menuLabel}>About</ThemedText>
-                <ThemedText style={styles.menuDescription}>
-                  App version 1.0.0
+
+              <View style={styles.aboutFooter}>
+                <ThemedText style={styles.aboutFooterText}>
+                  Developed by Tanjil
                 </ThemedText>
               </View>
-              <Ionicons name="chevron-forward" size={20} color="#94a3b8" />
-            </TouchableOpacity>
+            </View>
           </View>
 
           {/* Logout Button */}
@@ -412,6 +331,80 @@ const styles = StyleSheet.create({
   },
   appInfoText: {
     fontSize: 12,
+    color: "#94a3b8",
+  },
+  aboutCard: {
+    borderRadius: 16,
+    padding: 20,
+    borderWidth: 1,
+    borderColor: "#e2e8f0",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    elevation: 3,
+  },
+  aboutHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 16,
+  },
+  aboutIconContainer: {
+    width: 56,
+    height: 56,
+    borderRadius: 14,
+    justifyContent: "center",
+    alignItems: "center",
+    marginRight: 12,
+  },
+  aboutTitleContainer: {
+    flex: 1,
+  },
+  aboutTitle: {
+    fontSize: 20,
+    fontWeight: "700",
+    marginBottom: 2,
+  },
+  aboutVersion: {
+    fontSize: 13,
+    color: "#94a3b8",
+  },
+  aboutDivider: {
+    height: 1,
+    backgroundColor: "#e2e8f0",
+    marginBottom: 16,
+  },
+  aboutDescription: {
+    fontSize: 14,
+    lineHeight: 22,
+    color: "#64748b",
+    marginBottom: 20,
+  },
+  aboutFeatures: {
+    gap: 12,
+    marginBottom: 20,
+  },
+  featureRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+  },
+  featureText: {
+    fontSize: 14,
+    flex: 1,
+    color: "#64748b",
+  },
+  aboutFooter: {
+    alignItems: "center",
+    paddingTop: 16,
+    borderTopWidth: 1,
+    borderTopColor: "#e2e8f0",
+  },
+  aboutFooterText: {
+    fontSize: 13,
     color: "#94a3b8",
   },
 });
