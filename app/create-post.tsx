@@ -1,6 +1,7 @@
 import { ThemedText } from "@/components/ThemedText/themed-text";
 import { ThemedView } from "@/components/ThemedView/themed-view";
 import { useAuth } from "@/context/Auth/AuthContext";
+import { useThemeColor } from "@/hooks/use-theme-color";
 import { postsAPI } from "@/services/api";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
@@ -23,6 +24,9 @@ export default function CreatePostScreen() {
   const [isPosting, setIsPosting] = useState(false);
   const { user } = useAuth();
   const router = useRouter();
+  const textColor = useThemeColor({}, "text");
+  const backgroundColor = useThemeColor({}, "background");
+  const iconColor = useThemeColor({}, "icon");
 
   const handlePost = async () => {
     if (!content.trim()) {
@@ -57,7 +61,10 @@ export default function CreatePostScreen() {
   const isOverLimit = characterCount > maxCharacters;
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={["top"]}>
+    <SafeAreaView
+      style={[styles.safeArea, { backgroundColor }]}
+      edges={["top"]}
+    >
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={styles.container}
@@ -69,7 +76,7 @@ export default function CreatePostScreen() {
               style={styles.backButton}
               onPress={() => router.back()}
             >
-              <Ionicons name="close" size={28} color="#1a1a1a" />
+              <Ionicons name="close" size={28} color={textColor} />
             </TouchableOpacity>
             <ThemedText type="defaultSemiBold" style={styles.headerTitle}>
               Create Post
@@ -114,7 +121,7 @@ export default function CreatePostScreen() {
             {/* Content Input */}
             <View style={styles.inputContainer}>
               <TextInput
-                style={styles.input}
+                style={[styles.input, { color: textColor }]}
                 placeholder="What's on your mind?"
                 placeholderTextColor="#94a3b8"
                 value={content}
@@ -143,19 +150,19 @@ export default function CreatePostScreen() {
                 Posting Guidelines:
               </ThemedText>
               <View style={styles.guidelineItem}>
-                <Ionicons name="checkmark-circle" size={16} color="#10b981" />
+                <Ionicons name="checkmark-circle" size={16} color={iconColor} />
                 <ThemedText style={styles.guidelineText}>
                   Be respectful and kind
                 </ThemedText>
               </View>
               <View style={styles.guidelineItem}>
-                <Ionicons name="checkmark-circle" size={16} color="#10b981" />
+                <Ionicons name="checkmark-circle" size={16} color={iconColor} />
                 <ThemedText style={styles.guidelineText}>
                   Share meaningful content
                 </ThemedText>
               </View>
               <View style={styles.guidelineItem}>
-                <Ionicons name="checkmark-circle" size={16} color="#10b981" />
+                <Ionicons name="checkmark-circle" size={16} color={iconColor} />
                 <ThemedText style={styles.guidelineText}>
                   Keep it appropriate
                 </ThemedText>

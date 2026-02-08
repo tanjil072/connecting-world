@@ -211,6 +211,7 @@ export default function FeedScreen() {
             keyExtractor={(item) => item.id}
             contentContainerStyle={styles.listContent}
             showsVerticalScrollIndicator={false}
+            ItemSeparatorComponent={() => <View style={styles.separator} />}
             refreshControl={
               <RefreshControl
                 refreshing={isRefreshing}
@@ -312,6 +313,9 @@ const styles = StyleSheet.create({
   listContent: {
     paddingHorizontal: 20,
     paddingVertical: 12,
+  },
+  separator: {
+    height: 12,
   },
   loaderContainer: {
     flex: 1,

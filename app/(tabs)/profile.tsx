@@ -1,6 +1,7 @@
 import { ThemedText } from "@/components/ThemedText/themed-text";
 import { ThemedView } from "@/components/ThemedView/themed-view";
 import { useAuth } from "@/context/Auth/AuthContext";
+import { useThemeColor } from "@/hooks/use-theme-color";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
@@ -18,6 +19,12 @@ import { SafeAreaView } from "react-native-safe-area-context";
 export default function ProfileScreen() {
   const { user, logout } = useAuth();
   const router = useRouter();
+  const backgroundColor = useThemeColor({}, "background");
+  const textColor = useThemeColor({}, "text");
+  const borderColor = useThemeColor(
+    { light: "#e2e8f0", dark: "#334155" },
+    "icon",
+  );
 
   const handleLogout = () => {
     Alert.alert(
@@ -61,7 +68,7 @@ export default function ProfileScreen() {
           contentContainerStyle={styles.scrollContent}
         >
           {/* Profile Card */}
-          <View style={styles.profileCard}>
+          <View style={[styles.profileCard, { backgroundColor }]}>
             <LinearGradient
               colors={["#6366f1", "#8b5cf6", "#ec4899"]}
               start={{ x: 0, y: 0 }}
@@ -73,7 +80,9 @@ export default function ProfileScreen() {
               </Text>
             </LinearGradient>
 
-            <Text style={styles.name}>{user?.username}</Text>
+            <Text style={[styles.name, { color: textColor }]}>
+              {user?.username}
+            </Text>
             <ThemedText style={styles.email}>{user?.email}</ThemedText>
           </View>
 
@@ -82,7 +91,7 @@ export default function ProfileScreen() {
             <ThemedText style={styles.sectionTitle}>Account</ThemedText>
 
             <TouchableOpacity
-              style={styles.menuItem}
+              style={[styles.menuItem, { backgroundColor }]}
               onPress={() => {
                 // Navigate to feed with username filter
                 if (user?.username) {
@@ -90,7 +99,12 @@ export default function ProfileScreen() {
                 }
               }}
             >
-              <View style={styles.menuIconContainer}>
+              <View
+                style={[
+                  styles.menuIconContainer,
+                  { backgroundColor: borderColor },
+                ]}
+              >
                 <Ionicons name="person-outline" size={22} color="#6366f1" />
               </View>
               <View style={styles.menuContent}>
@@ -115,8 +129,13 @@ export default function ProfileScreen() {
               <Ionicons name="chevron-forward" size={20} color="#94a3b8" />
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.menuItem}>
-              <View style={styles.menuIconContainer}>
+            <TouchableOpacity style={[styles.menuItem, { backgroundColor }]}>
+              <View
+                style={[
+                  styles.menuIconContainer,
+                  { backgroundColor: borderColor },
+                ]}
+              >
                 <Ionicons name="bookmark-outline" size={22} color="#f59e0b" />
               </View>
               <View style={styles.menuContent}>
@@ -133,8 +152,13 @@ export default function ProfileScreen() {
           <View style={styles.menuSection}>
             <ThemedText style={styles.sectionTitle}>Settings</ThemedText>
 
-            <TouchableOpacity style={styles.menuItem}>
-              <View style={styles.menuIconContainer}>
+            <TouchableOpacity style={[styles.menuItem, { backgroundColor }]}>
+              <View
+                style={[
+                  styles.menuIconContainer,
+                  { backgroundColor: borderColor },
+                ]}
+              >
                 <Ionicons
                   name="notifications-outline"
                   size={22}
@@ -150,8 +174,13 @@ export default function ProfileScreen() {
               <Ionicons name="chevron-forward" size={20} color="#94a3b8" />
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.menuItem}>
-              <View style={styles.menuIconContainer}>
+            <TouchableOpacity style={[styles.menuItem, { backgroundColor }]}>
+              <View
+                style={[
+                  styles.menuIconContainer,
+                  { backgroundColor: borderColor },
+                ]}
+              >
                 <Ionicons
                   name="lock-closed-outline"
                   size={22}
@@ -167,8 +196,13 @@ export default function ProfileScreen() {
               <Ionicons name="chevron-forward" size={20} color="#94a3b8" />
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.menuItem}>
-              <View style={styles.menuIconContainer}>
+            <TouchableOpacity style={[styles.menuItem, { backgroundColor }]}>
+              <View
+                style={[
+                  styles.menuIconContainer,
+                  { backgroundColor: borderColor },
+                ]}
+              >
                 <Ionicons name="settings-outline" size={22} color="#64748b" />
               </View>
               <View style={styles.menuContent}>
@@ -185,8 +219,13 @@ export default function ProfileScreen() {
           <View style={styles.menuSection}>
             <ThemedText style={styles.sectionTitle}>About</ThemedText>
 
-            <TouchableOpacity style={styles.menuItem}>
-              <View style={styles.menuIconContainer}>
+            <TouchableOpacity style={[styles.menuItem, { backgroundColor }]}>
+              <View
+                style={[
+                  styles.menuIconContainer,
+                  { backgroundColor: borderColor },
+                ]}
+              >
                 <Ionicons
                   name="help-circle-outline"
                   size={22}
@@ -200,8 +239,13 @@ export default function ProfileScreen() {
               <Ionicons name="chevron-forward" size={20} color="#94a3b8" />
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.menuItem}>
-              <View style={styles.menuIconContainer}>
+            <TouchableOpacity style={[styles.menuItem, { backgroundColor }]}>
+              <View
+                style={[
+                  styles.menuIconContainer,
+                  { backgroundColor: borderColor },
+                ]}
+              >
                 <Ionicons
                   name="information-circle-outline"
                   size={22}
@@ -219,7 +263,10 @@ export default function ProfileScreen() {
           </View>
 
           {/* Logout Button */}
-          <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+          <TouchableOpacity
+            style={[styles.logoutButton, { backgroundColor, borderColor }]}
+            onPress={handleLogout}
+          >
             <Ionicons name="log-out-outline" size={22} color="#ef4444" />
             <ThemedText style={styles.logoutText}>Logout</ThemedText>
           </TouchableOpacity>
@@ -240,7 +287,6 @@ export default function ProfileScreen() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: "#f8f9fa",
   },
   container: {
     flex: 1,
@@ -259,7 +305,6 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   profileCard: {
-    backgroundColor: "#ffffff",
     borderRadius: 16,
     padding: 24,
     alignItems: "center",
@@ -309,10 +354,11 @@ const styles = StyleSheet.create({
   menuItem: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#ffffff",
     padding: 16,
     borderRadius: 12,
     marginBottom: 8,
+    borderWidth: 1,
+    borderColor: "#e2e8f0",
     shadowColor: "#000",
     shadowOffset: {
       width: 0,
@@ -326,7 +372,6 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 10,
-    backgroundColor: "#f8f9fa",
     justifyContent: "center",
     alignItems: "center",
     marginRight: 12,
@@ -347,11 +392,9 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#ffffff",
     padding: 16,
     borderRadius: 12,
     borderWidth: 1.5,
-    borderColor: "#fee2e2",
     marginBottom: 20,
     gap: 8,
   },
