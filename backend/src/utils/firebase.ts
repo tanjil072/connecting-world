@@ -1,4 +1,5 @@
 import * as admin from "firebase-admin";
+import * as path from "path";
 import { FCMToken, Notification } from "../models";
 
 let isFirebaseInitialized = false;
@@ -7,13 +8,14 @@ export async function initializeFirebase() {
   try {
     if (isFirebaseInitialized) return;
 
-    // Initialize Firebase Admin SDK
+    // Initialize Firebase Admin SDK with service account file
+    const serviceAccountPath = path.join(
+      __dirname,
+      "../../../connectingworld-76bdc-firebase-adminsdk-fbsvc-2a53a95763.json",
+    );
+
     admin.initializeApp({
-      credential: admin.credential.cert({
-        projectId: process.env.FIREBASE_PROJECT_ID,
-        privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, "\n"),
-        clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-      }),
+      credential: admin.credential.cert(serviceAccountPath),
     });
 
     console.log("Firebase initialized successfully");
