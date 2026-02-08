@@ -84,7 +84,7 @@ export default function FeedScreen() {
   };
 
   const handleSearch = () => {
-    setFilterUsername(searchUsername.trim());
+    setFilterUsername(searchUsername.trim().toLowerCase());
   };
 
   const handleClearFilter = () => {

@@ -116,7 +116,7 @@ export default function ProfileScreen() {
               <Ionicons name="chevron-forward" size={20} color="#94a3b8" />
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.menuItem}>
+            <TouchableOpacity style={[styles.menuItem, { backgroundColor }]}>
               <View style={styles.menuIconContainer}>
                 <Ionicons name="heart-outline" size={22} color="#ec4899" />
               </View>

@@ -58,7 +58,9 @@ export async function getPosts(req: Request, res: Response) {
     const userId = req.user?.userId;
 
     const skip = (page - 1) * limit;
-    const query = username ? { username } : {};
+    const query = username
+      ? { username: { $regex: username, $options: "i" } }
+      : {};
 
     const posts = await Post.find(query)
       .sort({ createdAt: -1 })
