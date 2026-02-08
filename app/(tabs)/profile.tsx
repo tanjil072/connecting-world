@@ -226,18 +226,7 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   profileCard: {
-    borderRadius: 16,
-    padding: 24,
     alignItems: "center",
-    marginBottom: 20,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.08,
-    shadowRadius: 8,
-    elevation: 3,
   },
   avatarLarge: {
     width: 100,
