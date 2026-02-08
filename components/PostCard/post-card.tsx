@@ -3,7 +3,7 @@ import { ThemedView } from "@/components/ThemedView/themed-view";
 import { postsAPI } from "@/services/api";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -19,7 +19,15 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onCommentPress }) => {
   const [isLiking, setIsLiking] = useState(false);
   const [isLiked, setIsLiked] = useState(post.isLiked);
   const [likesCount, setLikesCount] = useState(post.likesCount);
+  const [commentsCount, setCommentsCount] = useState(post.commentsCount);
   const [isExpanded, setIsExpanded] = useState(false);
+
+  // Sync state when post prop changes (e.g., on refresh)
+  useEffect(() => {
+    setIsLiked(post.isLiked);
+    setLikesCount(post.likesCount);
+    setCommentsCount(post.commentsCount);
+  }, [post.id, post.likesCount, post.commentsCount, post.isLiked]);
 
   const MAX_CHARS = 100;
   const shouldShowSeeMore = post.content.length > MAX_CHARS;
@@ -187,9 +195,7 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onCommentPress }) => {
             size={20}
             color="#64748b"
           />
-          <ThemedText style={styles.commentText}>
-            {post.commentsCount}
-          </ThemedText>
+          <ThemedText style={styles.commentText}>{commentsCount}</ThemedText>
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.actionButton} onPress={handleShare}>
