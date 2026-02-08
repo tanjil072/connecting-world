@@ -1,24 +1,39 @@
 # Social Feed App - Backend
 
-A lightweight Node.js/Express backend for a social media feed application with authentication, posts, likes, comments, and real-time notifications.
+A lightweight Node.js/Express backend for a social media feed application with user authentication, posts, likes, comments, and Firebase Cloud Messaging notifications.
 
-## Features
+**Version**: 1.0.0  
+**Database**: MongoDB  
+**Authentication**: JWT (JSON Web Tokens)  
+**Status**: Production Ready
 
-- ✅ User authentication (JWT-based)
-- ✅ Create and view posts
-- ✅ Like/unlike posts
-- ✅ Comment on posts
-- ✅ Firebase Cloud Messaging for notifications
-- ✅ SQLite database
-- ✅ Paginated feed
+## 📋 Features
+
+- ✅ User authentication with JWT tokens (7-day expiration)
+- ✅ Create, read, and manage posts
+- ✅ Like/unlike posts with like counters
+- ✅ Comment on posts with pagination
+- ✅ Firebase Cloud Messaging for push notifications
+- ✅ MongoDB database with schema validation
+- ✅ Paginated feed with infinite scroll support
 - ✅ Filter posts by username
+- ✅ Password hashing with bcryptjs
+- ✅ CORS configuration for different environments
 
-## Prerequisites
+## 📚 Quick Links
+
+- **Full API Documentation**: See [API_DOCS.md](API_DOCS.md)
+- **Environment Setup**: See [../.env.example](../.env.example) and [.env.example](.env.example)
+- **Build Guide**: See [../BUILD_GUIDE.md](../BUILD_GUIDE.md)
+
+## 🔧 Prerequisites
 
 - Node.js (v16 or higher)
 - npm or yarn
+- MongoDB (local or cloud)
+- Firebase Project (for notifications)
 
-## Installation
+## 📦 Installation
 
 1. Navigate to the backend folder:
 
@@ -32,7 +47,7 @@ cd backend
 npm install
 ```
 
-3. Create a `.env` file based on `.env.example`:
+3. Create a `.env` file from the example:
 
 ```bash
 cp .env.example .env
@@ -41,314 +56,290 @@ cp .env.example .env
 4. Update `.env` with your configuration:
 
 ```env
+# Server
 PORT=3000
-JWT_SECRET=your_jwt_secret_key_here
-FIREBASE_PROJECT_ID=your_firebase_project_id
-FIREBASE_PRIVATE_KEY=your_firebase_private_key
-FIREBASE_CLIENT_EMAIL=your_firebase_client_email
-DATABASE_TYPE=sqlite
-DATABASE_PATH=./data/database.db
 NODE_ENV=development
+
+# Database (MongoDB)
+MONGODB_URI=mongodb://localhost:27017/social-feed
+# For production: mongodb+srv://user:password@cluster.mongodb.net/social-feed
+
+# Authentication
+JWT_SECRET=your-super-secret-jwt-key-change-this-in-production
+
+# CORS
+CORS_ORIGIN=*
+# For production: https://your-app-domain.com
+
+# Firebase
+FIREBASE_PROJECT_ID=connectingworld-76bdc
+FIREBASE_CLIENT_EMAIL=firebase-adminsdk-fbsvc-2a53a95763@connectingworld-76bdc.iam.gserviceaccount.com
+FIREBASE_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\nYour key here\n-----END PRIVATE KEY-----\n"
 ```
 
-## Running the Server
+## 🚀 Running the Server
 
-### Development mode (with auto-reload):
+### Development mode (with auto-reload)
 
 ```bash
 npm run dev
 ```
 
-### Production build and run:
+The server will start on `http://localhost:3000`
+
+### Production mode
+
+Update `.env` values for production, then:
 
 ```bash
 npm run build
-npm start
+NODE_ENV=production npm start
 ```
 
-### Seed sample data:
+## 📡 API Endpoints
 
-```bash
-npm run seed
-```
+All endpoints are documented in [API_DOCS.md](API_DOCS.md). Quick reference:
 
-The server will start on `http://localhost:3000`
+### Authentication
 
-## API Documentation
+- `POST /api/auth/signup` - Create account
+- `POST /api/auth/login` - Login
 
-### Authentication Endpoints
+### Posts
 
-#### Signup
+- `POST /api/posts` - Create post
+- `GET /api/posts` - Get feed (paginated)
+- `GET /api/posts/:id` - Get post by ID
 
-```http
-POST /api/auth/signup
-Content-Type: application/json
+### Interactions
 
-{
-  "username": "john_doe",
-  "email": "john@example.com",
-  "password": "password123"
-}
-```
+- `POST /api/posts/:id/like` - Like/unlike post
+- `GET /api/posts/:id/likes` - Get post likes
+- `POST /api/posts/:id/comment` - Add comment
+- `GET /api/posts/:id/comments` - Get comments
 
-Response:
+### Notifications
 
-```json
-{
-  "success": true,
-  "message": "User created successfully",
-  "data": {
-    "userId": "uuid-here",
-    "username": "john_doe",
-    "email": "john@example.com",
-    "token": "jwt-token-here"
-  }
-}
-```
+- `POST /api/notifications/register-token` - Register FCM token
+- `POST /api/notifications/send` - Send notification
+- `GET /api/notifications` - Get notifications
 
-#### Login
-
-```http
-POST /api/auth/login
-Content-Type: application/json
-
-{
-  "email": "john@example.com",
-  "password": "password123"
-}
-```
-
-Response:
-
-```json
-{
-  "success": true,
-  "message": "Login successful",
-  "data": {
-    "userId": "uuid-here",
-    "username": "john_doe",
-    "email": "john@example.com",
-    "token": "jwt-token-here"
-  }
-}
-```
-
-### Posts Endpoints
-
-#### Create Post (requires authentication)
-
-```http
-POST /api/posts
-Authorization: Bearer <token>
-Content-Type: application/json
-
-{
-  "content": "This is my first post!"
-}
-```
-
-#### Get All Posts (paginated)
-
-```http
-GET /api/posts?page=1&limit=10&username=john_doe
-```
-
-Query parameters:
-
-- `page`: Page number (default: 1)
-- `limit`: Posts per page (default: 10)
-- `username`: Filter by username (optional)
-
-#### Get Specific Post
-
-```http
-GET /api/posts/:id
-```
-
-### Interactions Endpoints
-
-#### Like/Unlike Post (requires authentication)
-
-```http
-POST /api/posts/:id/like
-Authorization: Bearer <token>
-```
-
-Response:
-
-```json
-{
-  "success": true,
-  "message": "Post liked",
-  "data": {
-    "liked": true
-  }
-}
-```
-
-#### Add Comment (requires authentication)
-
-```http
-POST /api/posts/:id/comment
-Authorization: Bearer <token>
-Content-Type: application/json
-
-{
-  "content": "Great post!"
-}
-```
-
-#### Get Post Comments
-
-```http
-GET /api/posts/:id/comments?page=1&limit=10
-```
-
-#### Get Post Likes
-
-```http
-GET /api/posts/:id/likes
-```
-
-### Notifications Endpoints
-
-#### Register FCM Token (requires authentication)
-
-```http
-POST /api/notifications/register-token
-Authorization: Bearer <token>
-Content-Type: application/json
-
-{
-  "token": "fcm-device-token-here"
-}
-```
-
-## Project Structure
+## 📁 Project Structure
 
 ```
 backend/
 ├── src/
 │   ├── controllers/
-│   │   ├── authController.ts       # Authentication logic
-│   │   ├── postsController.ts      # Post management
-│   │   └── interactionsController.ts # Likes and comments
+│   │   ├── authController.ts          # User signup/login logic
+│   │   ├── postsController.ts         # Post CRUD operations
+│   │   └── interactionsController.ts  # Likes and comments
 │   ├── middleware/
-│   │   └── auth.ts                 # JWT authentication middleware
+│   │   └── auth.ts                    # JWT verification middleware
+│   ├── models/
+│   │   ├── User.ts                    # User schema
+│   │   ├── Post.ts                    # Post schema
+│   │   ├── Like.ts                    # Like schema
+│   │   ├── Comment.ts                 # Comment schema
+│   │   ├── Notification.ts            # Notification schema
+│   │   ├── FCMToken.ts                # FCM token schema
+│   │   └── index.ts                   # Model exports
 │   ├── routes/
-│   │   ├── auth.ts                 # Auth routes
-│   │   ├── posts.ts                # Post routes
-│   │   └── notifications.ts        # Notification routes
+│   │   ├── auth.ts                    # /api/auth routes
+│   │   ├── posts.ts                   # /api/posts routes
+│   │   └── notifications.ts           # /api/notifications routes
 │   ├── utils/
-│   │   ├── database.ts             # Database initialization
-│   │   ├── firebase.ts             # Firebase integration
-│   │   └── types.ts                # TypeScript type definitions
-│   ├── index.ts                    # Main app entry point
-│   └── seed.ts                     # Database seeding
-├── package.json
-├── tsconfig.json
-└── README.md
+│   │   ├── database.ts                # MongoDB connection
+│   │   └── firebase.ts                # Firebase utilities
+│   └── index.ts                       # Express app setup
+├── .env.example                       # Environment template
+├── package.json                       # Dependencies
+├── tsconfig.json                      # TypeScript config
+├── API_DOCS.md                        # Full API documentation
+└── README.md                          # This file
 ```
 
-## Error Handling
+## 💾 Database Setup
 
-All endpoints return a consistent JSON response format:
+### MongoDB Connection
 
-Success:
+**Development (Local)**:
+
+```env
+MONGODB_URI=mongodb://localhost:27017/social-feed
+```
+
+**Production (MongoDB Atlas)**:
+
+```env
+MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/social-feed
+```
+
+### Collections/Schema
+
+- **Users**: `_id`, `username`, `email`, `password`, `createdAt`
+- **Posts**: `_id`, `userId`, `username`, `content`, `createdAt`, `updatedAt`
+- **Likes**: `_id`, `postId`, `userId`, `username`, `createdAt`
+- **Comments**: `_id`, `postId`, `userId`, `username`, `text`, `createdAt`
+- **Notifications**: `_id`, `userId`, `title`, `body`, `read`, `createdAt`
+- **FCM Tokens**: `_id`, `userId`, `token`, `createdAt`
+
+See [API_DOCS.md](API_DOCS.md) for detailed schema information.
+
+## 🔥 Firebase Setup
+
+1. Create a Firebase project at [console.firebase.google.com](https://console.firebase.google.com/)
+2. Go to Project Settings → Service Accounts
+3. Generate a new private key
+4. Copy the values to your `.env`:
+   - `FIREBASE_PROJECT_ID`
+   - `FIREBASE_CLIENT_EMAIL`
+   - `FIREBASE_PRIVATE_KEY`
+
+## 🔐 Security Best Practices
+
+1. **JWT Secret**: Use a strong, random string in production
+
+   ```bash
+   openssl rand -base64 32
+   ```
+
+2. **Environment Variables**: Never commit `.env` to git
+
+3. **CORS**: Restrict to your frontend domain in production
+
+4. **HTTPS**: Always use HTTPS in production
+
+5. **Password Hashing**: Bcryptjs is configured with 10 salt rounds
+
+## 🐛 Troubleshooting
+
+### Port already in use
+
+```bash
+# Check what's using port 3000
+lsof -i :3000
+
+# Kill the process
+kill -9 <PID>
+```
+
+### MongoDB connection failed
+
+- Ensure MongoDB is running locally
+- For cloud: check connection string and IP whitelist in MongoDB Atlas
+- Verify `MONGODB_URI` in `.env`
+
+### JWT errors
+
+- Check `JWT_SECRET` is set correctly in `.env`
+- Verify token is included in Authorization header
+- Token expires after 7 days - user needs to login again
+
+### Firebase errors (development)
+
+- Firebase is optional in development
+- App works without it but notifications won't be sent
+- Check credentials in Firebase project settings
+
+### CORS errors
+
+- Check `CORS_ORIGIN` in `.env`
+- For development: set to `*`
+- For production: set to your exact frontend domain
+
+## 🛠️ Development Tools
+
+### Test API endpoints:
+
+- **Postman**: [postman.com](https://postman.com)
+- **Thunder Client**: VS Code extension
+- **cURL**: Command line
+
+### Monitor MongoDB:
+
+```bash
+# Using MongoDB Compass: https://www.mongodb.com/products/compass
+# Or MongoDB Atlas web interface
+```
+
+## 📊 API Response Format
+
+All responses follow this format:
+
+**Success**:
 
 ```json
 {
   "success": true,
-  "message": "Operation successful",
-  "data": {}
+  "message": "Operation description",
+  "data": {
+    /* response payload */
+  }
 }
 ```
 
-Error:
+**Error**:
 
 ```json
 {
   "success": false,
   "message": "Error description",
-  "error": "Detailed error message"
+  "error": "Detailed error (development only)"
 }
 ```
 
-## Database Schema
+## 🚀 Deployment
 
-### Users Table
+### Environment Variables for Production
 
-- `id` (TEXT) - Primary key
-- `username` (TEXT) - Unique username
-- `email` (TEXT) - Unique email
-- `password` (TEXT) - Hashed password
-- `createdAt` (DATETIME) - Creation timestamp
-
-### Posts Table
-
-- `id` (TEXT) - Primary key
-- `userId` (TEXT) - Foreign key to users
-- `username` (TEXT) - Post creator's username
-- `content` (TEXT) - Post content
-- `createdAt` (DATETIME) - Creation timestamp
-
-### Likes Table
-
-- `id` (TEXT) - Primary key
-- `postId` (TEXT) - Foreign key to posts
-- `userId` (TEXT) - Foreign key to users
-- `username` (TEXT) - Liker's username
-- `createdAt` (DATETIME) - Creation timestamp
-
-### Comments Table
-
-- `id` (TEXT) - Primary key
-- `postId` (TEXT) - Foreign key to posts
-- `userId` (TEXT) - Foreign key to users
-- `username` (TEXT) - Commenter's username
-- `content` (TEXT) - Comment content
-- `createdAt` (DATETIME) - Creation timestamp
-
-### FCM Tokens Table
-
-- `id` (TEXT) - Primary key
-- `userId` (TEXT) - Foreign key to users
-- `token` (TEXT) - Firebase Cloud Messaging token
-- `createdAt` (DATETIME) - Creation timestamp
-
-## Firebase Setup
-
-1. Create a Firebase project at https://console.firebase.google.com/
-2. Generate a service account key
-3. Add the credentials to your `.env` file
-4. Enable Cloud Messaging in your Firebase project
-
-## Common Issues
-
-### Port already in use
-
-Change the PORT in .env or kill the process using the port:
-
-```bash
-lsof -i :3000
-kill -9 <PID>
+```env
+NODE_ENV=production
+PORT=3000
+MONGODB_URI=mongodb+srv://...
+JWT_SECRET=<strong-random-string>
+CORS_ORIGIN=https://your-app-domain.com
+FIREBASE_PROJECT_ID=...
+FIREBASE_CLIENT_EMAIL=...
+FIREBASE_PRIVATE_KEY=...
 ```
 
-### Database locked error
+### Build and Start
 
-Restart the server and make sure no other process is using the database.
+```bash
+npm run build
+NODE_ENV=production npm start
+```
 
-### JWT token errors
+### Deployment Platforms
 
-Ensure the JWT_SECRET matches between token generation and verification.
+- **Heroku**: Add buildpack for Node.js
+- **AWS**: EC2, Lambda, or Elastic Beanstalk
+- **DigitalOcean**: App Platform or Droplets
+- **Railway**: Push code directly
+- **Render**: Connect GitHub repo
 
-## Development Tips
+## 📝 Related Documentation
 
-- Use `npm run dev` for development with auto-reloading
-- Check logs for debugging information
-- Use Postman or Thunder Client to test API endpoints
-- Database is stored in `data/database.db` locally
+- [Full API Documentation](API_DOCS.md)
+- [Environment Guide](../ENV_GUIDE.md)
+- [Frontend Setup](../QUICK_START.md)
+- [Build Guide](../BUILD_GUIDE.md)
 
-## License
+## 📞 Support
+
+Issues or questions?
+
+1. Check [API_DOCS.md](API_DOCS.md) for endpoint details
+2. Review logs in terminal for error messages
+3. Verify `.env` configuration
+4. Check MongoDB connection
+5. Ensure Firebase credentials are correct
+
+## 📄 License
 
 MIT
+
+---
+
+**Last Updated**: February 2026  
+**Maintainer**: Connecting World Team

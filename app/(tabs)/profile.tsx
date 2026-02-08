@@ -16,7 +16,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-export default function ProfileScreen() {
+const ProfileScreen = () => {
   const { user, logout } = useAuth();
   const router = useRouter();
   const backgroundColor = useThemeColor({}, "background");
@@ -282,7 +282,9 @@ export default function ProfileScreen() {
       </ThemedView>
     </SafeAreaView>
   );
-}
+};
+
+export default ProfileScreen;
 
 const styles = StyleSheet.create({
   safeArea: {

@@ -1,4 +1,3 @@
-import { useNotifications } from "@/context/Notifications/NotificationsContext";
 import { notificationsAPI } from "@/services/api";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
@@ -27,9 +26,8 @@ interface NotificationData {
   createdAt: string;
 }
 
-export default function NotificationsScreen() {
+const NotificationsScreen = () => {
   const router = useRouter();
-  const { refreshUnreadCount, decrementUnreadCount } = useNotifications();
   const insets = useSafeAreaInsets();
   const [notifications, setNotifications] = useState<NotificationData[]>([]);
   const [loading, setLoading] = useState(true);
@@ -210,7 +208,8 @@ export default function NotificationsScreen() {
       </View>
     </SafeAreaView>
   );
-}
+};
+export default NotificationsScreen;
 
 const styles = StyleSheet.create({
   container: {

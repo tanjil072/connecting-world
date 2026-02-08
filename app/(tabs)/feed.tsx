@@ -18,7 +18,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-export default function FeedScreen() {
+const FeedScreen = () => {
   const router = useRouter();
   const [posts, setPosts] = useState<Post[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -92,6 +92,7 @@ export default function FeedScreen() {
     setFilterUsername("");
   };
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const handleCommentPress = (postId: string, post?: Post) => {
     router.push({
       pathname: "/comments",
@@ -229,7 +230,9 @@ export default function FeedScreen() {
       </ThemedView>
     </SafeAreaView>
   );
-}
+};
+
+export default FeedScreen;
 
 const styles = StyleSheet.create({
   safeArea: {

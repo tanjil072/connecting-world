@@ -16,7 +16,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-export default function SignupScreen() {
+const SignupScreen = () => {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -208,7 +208,9 @@ export default function SignupScreen() {
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
-}
+};
+
+export default SignupScreen;
 
 const styles = StyleSheet.create({
   safeArea: {

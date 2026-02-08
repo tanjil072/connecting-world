@@ -28,7 +28,7 @@ interface Comment {
   createdAt: string;
 }
 
-export default function CommentsScreen() {
+const CommentsScreen = () => {
   const { postId, username } = useLocalSearchParams();
   const router = useRouter();
   const [comments, setComments] = useState<Comment[]>([]);
@@ -176,7 +176,9 @@ export default function CommentsScreen() {
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
-}
+};
+
+export default CommentsScreen;
 
 const styles = StyleSheet.create({
   safeArea: {

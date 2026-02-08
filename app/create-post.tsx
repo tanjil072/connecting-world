@@ -19,7 +19,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-export default function CreatePostScreen() {
+const CreatePostScreen = () => {
   const [content, setContent] = useState("");
   const [isPosting, setIsPosting] = useState(false);
   const { user } = useAuth();
@@ -173,7 +173,9 @@ export default function CreatePostScreen() {
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
-}
+};
+
+export default CreatePostScreen;
 
 const styles = StyleSheet.create({
   safeArea: {
