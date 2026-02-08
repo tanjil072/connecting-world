@@ -72,6 +72,15 @@ export const notificationsAPI = {
   saveFCMToken: (token: string) => {
     return api.post("/notifications/register-token", { token });
   },
+  getNotifications: (page: number = 1, limit: number = 20) => {
+    return api.get("/notifications", { params: { page, limit } });
+  },
+  markAsRead: (notificationIds: string[] | "all") => {
+    return api.patch("/notifications/read", { notificationIds });
+  },
+  sendTestNotification: () => {
+    return api.post("/notifications/test");
+  },
 };
 
 export default api;

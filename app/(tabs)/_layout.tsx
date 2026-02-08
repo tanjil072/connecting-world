@@ -3,11 +3,14 @@ import React from "react";
 
 import { HapticTab } from "@/components/HecticTab/haptic-tab";
 import { Colors } from "@/constants/theme";
+import { useNotifications } from "@/context/Notifications/NotificationsContext";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { Ionicons } from "@expo/vector-icons";
+import { StyleSheet, Text, View } from "react-native";
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
+  const { unreadCount } = useNotifications();
 
   return (
     <Tabs
@@ -35,11 +38,20 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="explore"
+        name="notifications"
         options={{
-          title: "Explore",
+          title: "Notifications",
           tabBarIcon: ({ color }) => (
-            <Ionicons name="compass" size={24} color={color} />
+            <View>
+              <Ionicons name="notifications" size={24} color={color} />
+              {unreadCount > 0 && (
+                <View style={styles.badge}>
+                  <Text style={styles.badgeText}>
+                    {unreadCount > 99 ? "99+" : unreadCount}
+                  </Text>
+                </View>
+              )}
+            </View>
           ),
         }}
       />
@@ -53,6 +65,12 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
+        name="explore"
+        options={{
+          href: null, // Hide from tabs
+        }}
+      />
+      <Tabs.Screen
         name="index"
         options={{
           href: null, // Hide from tabs
@@ -61,3 +79,23 @@ export default function TabLayout() {
     </Tabs>
   );
 }
+
+const styles = StyleSheet.create({
+  badge: {
+    position: "absolute",
+    right: -8,
+    top: -4,
+    backgroundColor: "#FF6B6B",
+    borderRadius: 10,
+    minWidth: 18,
+    height: 18,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: 4,
+  },
+  badgeText: {
+    color: "#fff",
+    fontSize: 10,
+    fontWeight: "bold",
+  },
+});

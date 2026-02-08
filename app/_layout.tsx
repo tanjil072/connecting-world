@@ -1,4 +1,8 @@
 import { AuthProvider, useAuth } from "@/context/Auth/AuthContext";
+import {
+  NotificationsProvider,
+  useNotifications,
+} from "@/context/Notifications/NotificationsContext";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { notificationsAPI } from "@/services/api";
 import {
@@ -26,6 +30,7 @@ export const unstable_settings = {
 
 function RootLayoutNav() {
   const { isSignedIn, isLoading } = useAuth();
+  const { refreshUnreadCount } = useNotifications();
   const segments = useSegments();
   const router = useRouter();
 
@@ -77,6 +82,9 @@ function RootLayoutNav() {
     const unsubscribeOnMessage = messaging().onMessage(
       async (remoteMessage: any) => {
         console.log("📱 Foreground notification received:", remoteMessage);
+
+        // Refresh unread count when notification arrives
+        refreshUnreadCount();
 
         // Display notification when app is in foreground
         if (remoteMessage.notification) {
@@ -152,10 +160,14 @@ export default function RootLayout() {
 
   return (
     <AuthProvider>
-      <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
-        <RootLayoutNav />
-        <StatusBar style="auto" />
-      </ThemeProvider>
+      <NotificationsProvider>
+        <ThemeProvider
+          value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
+        >
+          <RootLayoutNav />
+          <StatusBar style="auto" />
+        </ThemeProvider>
+      </NotificationsProvider>
     </AuthProvider>
   );
 }

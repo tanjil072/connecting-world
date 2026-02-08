@@ -1,5 +1,5 @@
 import * as admin from "firebase-admin";
-import { FCMToken } from "../models";
+import { FCMToken, Notification } from "../models";
 
 let isFirebaseInitialized = false;
 
@@ -65,6 +65,23 @@ export async function sendNotification(
   data?: Record<string, string>,
 ) {
   try {
+    // Save notification to database first
+    const notificationType = data?.type as
+      | "like"
+      | "comment"
+      | "follow"
+      | "other"
+      | undefined;
+    await Notification.create({
+      userId,
+      title,
+      body,
+      type: notificationType || "other",
+      data: data || {},
+      read: false,
+    });
+    console.log(`💾 Saved notification to database for user ${userId}`);
+
     console.log(`🔍 Looking for FCM tokens for user: ${userId}`);
     const tokens = await FCMToken.find({ userId }).select("token").lean();
     console.log(`Found ${tokens.length} token(s) for user ${userId}`);

@@ -56,6 +56,12 @@ export async function likePost(req: Request, res: Response) {
           post.userId,
           `${username} liked your post`,
           `${username} liked your post: "${post.content.substring(0, 50)}..."`,
+          {
+            type: "like",
+            postId: id,
+            fromUserId: userId,
+            fromUsername: username,
+          },
         );
       } else {
         console.log(`ℹ️ Not sending notification - user liked their own post`);
@@ -123,6 +129,12 @@ export async function commentOnPost(req: Request, res: Response) {
         post.userId,
         `${username} commented on your post`,
         `${username}: "${content.substring(0, 50)}..."`,
+        {
+          type: "comment",
+          postId: id,
+          fromUserId: userId,
+          fromUsername: username,
+        },
       );
     } else {
       console.log(
