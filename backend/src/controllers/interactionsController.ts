@@ -49,11 +49,16 @@ export async function likePost(req: Request, res: Response) {
 
       // Send notification to post owner
       if (post.userId !== userId) {
+        console.log(
+          `📤 Sending like notification from ${username} (${userId}) to post owner (${post.userId})`,
+        );
         await sendNotification(
           post.userId,
           `${username} liked your post`,
           `${username} liked your post: "${post.content.substring(0, 50)}..."`,
         );
+      } else {
+        console.log(`ℹ️ Not sending notification - user liked their own post`);
       }
 
       return res.status(201).json({
@@ -111,10 +116,17 @@ export async function commentOnPost(req: Request, res: Response) {
 
     // Send notification to post owner
     if (post.userId !== userId) {
+      console.log(
+        `📤 Sending comment notification from ${username} (${userId}) to post owner (${post.userId})`,
+      );
       await sendNotification(
         post.userId,
         `${username} commented on your post`,
         `${username}: "${content.substring(0, 50)}..."`,
+      );
+    } else {
+      console.log(
+        `ℹ️ Not sending notification - user commented on their own post`,
       );
     }
 

@@ -2,7 +2,10 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 
 // Replace with your actual backend URL
-const API_BASE_URL = "http://localhost:3000/api"; // Change this to your backend URL
+// For physical Android device, use your computer's IP address
+// For Android Emulator, use 10.0.2.2
+// For iOS Simulator, use localhost
+const API_BASE_URL = "http://192.168.0.240:3000/api";
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -66,8 +69,8 @@ export const postsAPI = {
 
 // Notifications API
 export const notificationsAPI = {
-  saveFCMToken: (fcmToken: string) => {
-    return api.post("/notifications/token", { fcmToken });
+  saveFCMToken: (token: string) => {
+    return api.post("/notifications/register-token", { token });
   },
 };
 

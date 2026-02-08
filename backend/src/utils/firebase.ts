@@ -26,6 +26,9 @@ export async function initializeFirebase() {
 
 export async function registerFCMToken(userId: string, token: string) {
   try {
+    console.log(`Attempting to register FCM token for user ${userId}`);
+    console.log(`Token: ${token.substring(0, 20)}...`);
+
     // Check if token already exists
     const existingToken = await FCMToken.findOne({ token });
 
@@ -35,15 +38,22 @@ export async function registerFCMToken(userId: string, token: string) {
         existingToken.userId = userId;
         await existingToken.save();
         console.log(`Updated FCM token for user ${userId}`);
+      } else {
+        console.log(`FCM token already exists for user ${userId}`);
       }
       return;
     }
 
     // Create new token
-    await FCMToken.create({ userId, token });
-    console.log(`Registered new FCM token for user ${userId}`);
+    const newToken = await FCMToken.create({ userId, token });
+    console.log(`✅ Successfully registered new FCM token for user ${userId}`);
+    console.log(`Token ID: ${newToken._id}`);
+
+    // Verify the token was saved
+    const verifyToken = await FCMToken.findOne({ userId, token });
+    console.log(`Verification: Token found = ${!!verifyToken}`);
   } catch (error) {
-    console.error("Error registering FCM token:", error);
+    console.error("❌ Error registering FCM token:", error);
     throw error;
   }
 }
@@ -55,10 +65,26 @@ export async function sendNotification(
   data?: Record<string, string>,
 ) {
   try {
+    console.log(`🔍 Looking for FCM tokens for user: ${userId}`);
     const tokens = await FCMToken.find({ userId }).select("token").lean();
+    console.log(`Found ${tokens.length} token(s) for user ${userId}`);
 
     if (tokens.length === 0) {
-      console.log(`No FCM tokens found for user ${userId}`);
+      // Check total tokens in DB
+      const totalTokens = await FCMToken.countDocuments();
+      console.log(
+        `⚠️ No FCM tokens found for user ${userId}. Total tokens in DB: ${totalTokens}`,
+      );
+
+      // List all tokens for debugging
+      const allTokens = await FCMToken.find().select("userId token").lean();
+      console.log(
+        "All tokens in DB:",
+        allTokens.map((t) => ({
+          userId: t.userId,
+          token: t.token.substring(0, 20) + "...",
+        })),
+      );
       return;
     }
 

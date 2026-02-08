@@ -1,5 +1,6 @@
 import { AuthProvider, useAuth } from "@/context/Auth/AuthContext";
 import { useColorScheme } from "@/hooks/use-color-scheme";
+import { notificationsAPI } from "@/services/api";
 import {
   DarkTheme,
   DefaultTheme,
@@ -41,6 +42,66 @@ function RootLayoutNav() {
     }
   }, [isSignedIn, isLoading, segments]);
 
+  // Setup FCM when user is signed in
+  useEffect(() => {
+    if (!messaging || !isSignedIn) return;
+
+    const setupFCM = async () => {
+      try {
+        const authStatus = await messaging().requestPermission();
+        const enabled =
+          authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
+          authStatus === messaging.AuthorizationStatus.PROVISIONAL;
+
+        if (enabled) {
+          console.log("Authorization status:", authStatus);
+
+          const token = await messaging().getToken();
+          console.log("Device FCM Token:", token);
+
+          // Send FCM token to backend
+          try {
+            await notificationsAPI.saveFCMToken(token);
+            console.log("FCM token saved to backend successfully");
+          } catch (error) {
+            console.error("Error saving FCM token to backend:", error);
+          }
+        }
+      } catch (error) {
+        console.error("Error setting up FCM:", error);
+      }
+    };
+
+    setupFCM();
+
+    // Handle notifications
+    const unsubscribeOnMessage = messaging().onMessage(
+      async (remoteMessage: any) => {
+        console.log("A new FCM message arrived!", remoteMessage);
+      },
+    );
+
+    messaging().onNotificationOpenedApp((remoteMessage: any) => {
+      console.log(
+        "Notification caused app to open from background state:",
+        remoteMessage.notification,
+      );
+    });
+
+    messaging()
+      .getInitialNotification()
+      .then((remoteMessage: any) => {
+        if (remoteMessage) {
+          console.log(
+            "Notification caused app to open from quit state:",
+            remoteMessage.notification,
+          );
+        }
+      });
+
+    return unsubscribeOnMessage;
+  }, [isSignedIn]);
+
   return (
     <Stack>
       <Stack.Screen name="(auth)" options={{ headerShown: false }} />
@@ -70,73 +131,13 @@ function RootLayoutNav() {
 export default function RootLayout() {
   const colorScheme = useColorScheme();
 
-  const requestUserPermission = async () => {
-    if (!messaging) return false;
-    try {
-      const authStatus = await messaging().requestPermission();
-      const enabled =
-        authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
-        authStatus === messaging.AuthorizationStatus.PROVISIONAL;
-
-      if (enabled) {
-        console.log("Authorization status:", authStatus);
-      }
-      return enabled;
-    } catch (error) {
-      console.log("Firebase not configured:", error);
-      return false;
-    }
-  };
-
+  // Register background handler (needs to be registered early)
   useEffect(() => {
-    if (!messaging) {
-      console.log("Firebase messaging not available - skipping setup");
-      return;
-    }
+    if (!messaging) return;
 
-    requestUserPermission().then((enabled) => {
-      if (enabled) {
-        messaging()
-          .getToken()
-          .then((token: string) => {
-            console.log("Device FCM Token:", token);
-          })
-          .catch((error: any) => {
-            console.error("Error getting FCM token:", error);
-          });
-      }
-    });
-
-    // check whether an initial notification is available
-    messaging()
-      .getInitialNotification()
-      .then((remoteMessage: any) => {
-        if (remoteMessage) {
-          console.log(
-            "Notification caused app to open from quit state:",
-            remoteMessage.notification,
-          );
-        }
-      });
-
-    // assume a message-notification contains a "type" property in the data payload of the screen to open
-    messaging().onNotificationOpenedApp((remoteMessage: any) => {
-      console.log(
-        "Notification caused app to open from background state:",
-        remoteMessage.notification,
-      );
-    });
-
-    // register background handler
     messaging().setBackgroundMessageHandler(async (remoteMessage: any) => {
       console.log("Message handled in the background!", remoteMessage);
     });
-
-    const unsubscribe = messaging().onMessage(async (remoteMessage: any) => {
-      console.log("A new FCM message arrived!", remoteMessage);
-    });
-
-    return unsubscribe;
   }, []);
 
   return (
